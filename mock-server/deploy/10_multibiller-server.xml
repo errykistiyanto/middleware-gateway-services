@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<server class="org.jpos.q2.iso.QServer" logger="Q2" name="sandboxiso8583-server" realm="sandboxiso8583-server-realm">
+    <channel class="co.id.middleware.mock.channel.FinnetChannel" logger="Q2" packager="org.jpos.iso.packager.ISO87APackager"/>
+    <attr name="port" type="java.lang.Integer">13000</attr>
+    <request-listener class="co.id.middleware.mock.jpos.RequestListener" logger="Q2">
+        <property name="space"      value="tspace:defaultbiller"/>
+        <property name="queue"      value="mytxnqueuebiller"/>
+        <property name="isorequest" value="REQUESTBILLER"/>
+        <property name="isosource"  value="ISOBILLER"/>
+        <property name="logger"     value="Q2"/>
+        <property name="appname"    value="sandboxiso8583"/>
+        <property name="timeout"    value="30000"/>
+        <property name="port"       value="13000"/>
+    </request-listener>
+</server>

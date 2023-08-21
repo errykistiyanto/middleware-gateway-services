@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<logon-mgr class="co.id.middleware.finnet.jpos.LogonManager" logger="Q2" name="multibiller-logonmgr" realm="multibiller-logonmgr">
+    <property name="mux" value="multibiller-mux" />
+    <property name="space" value="jdbm:multibiller" />
+    <property name="logger" value="Q2" />
+    <property name="channel-ready" value="multibiller-channel.ready" />
+    <property name="timeout" value="10000" />
+    <property name="echo-interval" value="30000" />
+    <property name="logon-interval" value="8640000" />
+<!--    <property name="echo-interval" value="5000" />-->
+<!--    <property name="logon-interval" value="30000" />-->
+    <property name="logon-mode" value="true" />
+    <property name="echo-mode" value="true" />
+</logon-mgr>

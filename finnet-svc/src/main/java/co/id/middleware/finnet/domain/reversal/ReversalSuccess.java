@@ -15,6 +15,6 @@ public class ReversalSuccess {
 
     private String responseCode;
     private String responseMessage;
-    public Object data;
+    public ReversalResponse data;
 
 }

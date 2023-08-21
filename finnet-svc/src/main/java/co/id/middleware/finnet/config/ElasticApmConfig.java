@@ -48,3 +48,4 @@ public class ElasticApmConfig {
         ElasticApmAttacher.attach(apmProps);
     }
 }
+

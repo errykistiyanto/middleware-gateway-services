@@ -1,4 +1,4 @@
-package co.id.middleware.finnet.entity;
+package co.id.middleware.finnet.postgre;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
@@ -15,6 +15,7 @@ import javax.persistence.MappedSuperclass;
         @TypeDef(name = "json", typeClass = JsonStringType.class),
         @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 })
+
 @MappedSuperclass
 public class BaseEntity {
 

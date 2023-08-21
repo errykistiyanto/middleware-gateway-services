@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<mux class="org.jpos.q2.iso.QMUX" logger="Q2" name="multibiller-mux" realm="multibiller-mux">
+    <out>multibiller-channel-in</out>
+    <in>multibiller-channel-out</in>
+    <ready>multibiller-channel.ready</ready>
+    <unhandled>multibiller-channel-unhandled</unhandled>
+</mux>

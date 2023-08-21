@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<txnmgr class="org.jpos.transaction.TransactionManager" logger="Q2" name="sandboxiso8583-trxmgnr" realm="sandboxiso8583-trxmgnr-realm">
+    <property name="space"      value="tspace:defaultbiller"/>
+    <property name="queue"      value="mytxnqueuebiller"/>
+    <property name="debug"      value="false"/>
+    <property name="profiler"   value="true"/>
+
+    <participant class="co.id.middleware.mock.jpos.Selector" logger="Q2">
+        <property name="0800001"      value="LogOn"/>
+        <property name="0800301"      value="Echo"/>
+        <property name="0200381099"   value="Inquiry"/>
+        <property name="0200501099"   value="Payment"/>
+        <property name="0400501099"   value="Reversal"/>
+        <property name="isorequest" value="REQUESTBILLER"/>
+        <property name="isosource"  value="ISOBILLER"/>
+        <property name="logger"     value="Q2"/>
+    </participant>
+
+    <group name="LogOn">
+        <participant class="co.id.middleware.mock.jpos.Route" logger="Q2">
+            <property name="isorequest"     value="REQUESTBILLER"/>
+            <property name="isosource"      value="ISOBILLER"/>
+            <property name="logger"         value="Q2"/>
+            <property name="timeout"        value="10000" />
+        </participant>
+    </group>
+
+    <group name="Echo">
+        <participant class="co.id.middleware.mock.jpos.Route" logger="Q2">
+            <property name="isorequest"     value="REQUESTBILLER"/>
+            <property name="isosource"      value="ISOBILLER"/>
+            <property name="logger"         value="Q2"/>
+            <property name="timeout"        value="10000" />
+        </participant>
+    </group>
+
+    <group name="Inquiry">
+        <participant class="co.id.middleware.mock.iso.Inquiry" logger="Q2">
+            <property name="isorequest"     value="REQUESTBILLER"/>
+            <property name="isosource"      value="ISOBILLER"/>
+            <property name="logger"         value="Q2"/>
+            <property name="timeout"        value="30000" />
+        </participant>
+    </group>
+
+    <group name="Payment">
+        <participant class="co.id.middleware.mock.iso.Payment" logger="Q2">
+            <property name="isorequest"     value="REQUESTBILLER"/>
+            <property name="isosource"      value="ISOBILLER"/>
+            <property name="logger"         value="Q2"/>
+            <property name="timeout"        value="30000" />
+        </participant>
+    </group>
+
+    <group name="Reversal">
+        <participant class="co.id.middleware.mock.iso.Reversal" logger="Q2">
+            <property name="isorequest"     value="REQUESTBILLER"/>
+            <property name="isosource"      value="ISOBILLER"/>
+            <property name="logger"         value="Q2"/>
+            <property name="timeout"        value="30000" />
+        </participant>
+    </group>
+
+</txnmgr>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<channel-adaptor class="org.jpos.q2.iso.ChannelAdaptor" logger="Q2" name="multibiller-channel" realm="multibiller-channel">
+    <channel class="co.id.middleware.finnet.jpos.Channel" logger="Q2" packager="org.jpos.iso.packager.ISO87APackager">
+<!--    <channel class="org.jpos.iso.channel.ASCIIChannel" logger="Q2" packager="org.jpos.iso.packager.ISO87APackager">-->
+    <!--development-->
+        <property name="host" value="127.0.0.1"/>
+<!--        <property name="port" value="13000"/>-->
+        <!--production-->
+<!--        <property name="host" value="10.100.111.152"/>-->
+        <property name="port" value="13000"/>
+        <property name="timeout" value="360000" />
+        <property name="keep-alive" value="true" />
+    </channel>
+    <in>multibiller-channel-in</in>
+    <out>multibiller-channel-out</out>
+    <ready>multibiller-channel.ready</ready>
+    <unhandled>multibiller-channel-unhandled</unhandled>
+    <reconnect-delay>10000</reconnect-delay>
+</channel-adaptor>

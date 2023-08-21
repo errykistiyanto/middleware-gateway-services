@@ -15,6 +15,7 @@ public class InquiryFailed {
 
     private String responseCode;
     private String responseMessage;
+
     public InquiryRequest data;
 
 }

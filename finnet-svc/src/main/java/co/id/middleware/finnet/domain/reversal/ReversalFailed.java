@@ -15,6 +15,7 @@ public class ReversalFailed {
 
     private String responseCode;
     private String responseMessage;
+
     public ReversalRequest data;
 
 }

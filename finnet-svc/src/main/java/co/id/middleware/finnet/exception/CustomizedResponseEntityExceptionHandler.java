@@ -19,15 +19,21 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 
     @ExceptionHandler(Exception.class)
     public final ResponseEntity<Object> handleAllExceptions(Exception ex, WebRequest request) {
-        ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDateTime.now(), "12", "general exception",
-                ex.getMessage());
+        ExceptionResponse exceptionResponse = new ExceptionResponse(
+                LocalDateTime.now(), "12",
+                "General exception",
+//                ex.getMessage()
+                ""
+        );
         return new ResponseEntity(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
     protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex,
                                                                    HttpHeaders headers, HttpStatus status, WebRequest request) {
-        ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDateTime.now(), "12", "invalid productName",
+        ExceptionResponse exceptionResponse = new ExceptionResponse(
+                LocalDateTime.now(), "12",
+                "Invalid productName",
 //                ex.getMessage()
                 "");
         return new ResponseEntity(exceptionResponse, HttpStatus.NOT_FOUND);
@@ -36,7 +42,9 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
                                                                   HttpHeaders headers, HttpStatus status, WebRequest request) {
-        ExceptionResponse exceptionResponse = new ExceptionResponse(LocalDateTime.now(), "12", "invalid request",
+        ExceptionResponse exceptionResponse = new ExceptionResponse(
+                LocalDateTime.now(), "12",
+                "Invalid request",
                 //ex.getBindingResult().toString());
                 ex.getFieldError().getDefaultMessage());
         return new ResponseEntity(exceptionResponse, HttpStatus.BAD_REQUEST);

@@ -9,9 +9,9 @@
               value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>log/spring.log</file>
+        <file>log/spring/spring.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>log/spring.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <fileNamePattern>log/spring/spring.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
             <!--<maxHistory>1</maxHistory>-->
         </rollingPolicy>
         <encoder>

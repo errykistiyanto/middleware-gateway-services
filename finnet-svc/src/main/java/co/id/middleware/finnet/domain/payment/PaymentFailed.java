@@ -15,6 +15,8 @@ public class PaymentFailed {
 
     private String responseCode;
     private String responseMessage;
+
     public PaymentRequest data;
+
 
 }

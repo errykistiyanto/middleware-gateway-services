@@ -1,5 +1,7 @@
 FROM openjdk:11-jdk-slim
-COPY target/finnet-svc.jar opt/finnet-svc.jar
+COPY target/openapi.jar opt/openapi.jar
+COPY deploy /deploy
+COPY packager /packager
 COPY log /log
 ENV TZ Asia/Jakarta
 ENTRYPOINT ["java","-jar","/opt/finnet-svc.jar"]

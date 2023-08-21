@@ -1,4 +1,4 @@
-package co.id.middleware.finnet.entity;
+package co.id.middleware.finnet.postgre;
 
 import lombok.Data;
 import org.hibernate.annotations.Type;
@@ -6,13 +6,9 @@ import org.hibernate.annotations.Type;
 import javax.persistence.*;
 import java.util.Date;
 
-/**
- * @author errykistiyanto@gmail.com 2022-02-17
- */
-
 @Data
 @Entity
-@Table(name = "history")
+@Table(name = "bankdkiSvc")
 public class DataLog extends BaseEntity {
     @Id()
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,4 +17,5 @@ public class DataLog extends BaseEntity {
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
     private String messageData;
+
 }

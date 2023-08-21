@@ -1,6 +1,6 @@
-package co.id.middleware.finnet.util;
+package co.id.middleware.finnet.utils;
 
-import co.id.middleware.finnet.entity.DataLog;
+import co.id.middleware.finnet.postgre.DataLog;
 import co.id.middleware.finnet.repository.HistoryService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

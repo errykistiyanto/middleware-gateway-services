@@ -1,11 +1,11 @@
 package co.id.middleware.finnet.repository;
 
-import co.id.middleware.finnet.entity.DataLog;
+import co.id.middleware.finnet.postgre.DataLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * @author errykistiyanto@gmail.com 2022-09-12
+ * @author errykistiyanto@gmail.com 2020-03-05
  */
 @Service
 public class HistoryImpl implements HistoryService {
