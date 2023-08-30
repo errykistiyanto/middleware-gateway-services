@@ -89,28 +89,28 @@
 <!--			<groupId>org.springframework.boot</groupId>-->
 <!--			<artifactId>spring-boot-starter-security</artifactId>-->
 <!--		</dependency>-->
-		<dependency>
-			<groupId>net.logstash.logback</groupId>
-			<artifactId>logstash-logback-encoder</artifactId>
-			<version>7.2</version>
-		</dependency>
-		<dependency>
-			<groupId>co.elastic.apm</groupId>
-			<artifactId>apm-agent-attach</artifactId>
-			<version>1.36.0</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/co.elastic.apm/apm-agent-api -->
-		<dependency>
-			<groupId>co.elastic.apm</groupId>
-			<artifactId>apm-agent-api</artifactId>
-			<version>1.36.0</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/co.elastic.apm/apm-opentracing -->
-		<dependency>
-			<groupId>co.elastic.apm</groupId>
-			<artifactId>apm-opentracing</artifactId>
-			<version>1.36.0</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>net.logstash.logback</groupId>-->
+<!--			<artifactId>logstash-logback-encoder</artifactId>-->
+<!--			<version>7.2</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>co.elastic.apm</groupId>-->
+<!--			<artifactId>apm-agent-attach</artifactId>-->
+<!--			<version>1.36.0</version>-->
+<!--		</dependency>-->
+<!--		&lt;!&ndash; https://mvnrepository.com/artifact/co.elastic.apm/apm-agent-api &ndash;&gt;-->
+<!--		<dependency>-->
+<!--			<groupId>co.elastic.apm</groupId>-->
+<!--			<artifactId>apm-agent-api</artifactId>-->
+<!--			<version>1.36.0</version>-->
+<!--		</dependency>-->
+<!--		&lt;!&ndash; https://mvnrepository.com/artifact/co.elastic.apm/apm-opentracing &ndash;&gt;-->
+<!--		<dependency>-->
+<!--			<groupId>co.elastic.apm</groupId>-->
+<!--			<artifactId>apm-opentracing</artifactId>-->
+<!--			<version>1.36.0</version>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>com.vladmihalcea</groupId>
 			<artifactId>hibernate-types-52</artifactId>

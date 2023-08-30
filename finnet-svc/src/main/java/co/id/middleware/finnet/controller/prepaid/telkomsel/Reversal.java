@@ -1,6 +1,9 @@
-package co.id.middleware.finnet.controller.postpaid.hallo;
+package co.id.middleware.finnet.controller.prepaid.telkomsel;
 
-import co.id.middleware.finnet.domain.reversal.*;
+import co.id.middleware.finnet.domain.reversal.ReversalFailed;
+import co.id.middleware.finnet.domain.reversal.ReversalRequest;
+import co.id.middleware.finnet.domain.reversal.ReversalResponse;
+import co.id.middleware.finnet.domain.reversal.ReversalSuccess;
 import co.id.middleware.finnet.repository.HistoryService;
 import co.id.middleware.finnet.utils.FinnetRCTextParser;
 import co.id.middleware.finnet.utils.Logging;
@@ -8,14 +11,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
-import org.jpos.iso.ISODate;
 import org.jpos.iso.ISOException;
-import org.jpos.iso.ISOMsg;
-import org.jpos.iso.ISOUtil;
-import org.jpos.q2.iso.QMUX;
 import org.jpos.space.Space;
 import org.jpos.space.SpaceFactory;
 import org.jpos.space.SpaceUtil;
+import org.jpos.util.Log;
 import org.jpos.util.NameRegistrar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -32,15 +32,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
- * @author errykistiyanto@gmail.com 2022-09-12
+ * @author briantomo80@gmail.com 24/08/23
  */
 
 @RestController
 @Slf4j
-@Component("ReversalPostpaidTelkomsel")
+@Component("ReversalPrepaidTelkomsel")
 public class Reversal {
 
     @Autowired
@@ -68,7 +70,7 @@ public class Reversal {
     public static final String out_resp = "outgoing response";
     //logstash message direction
 
-    @RequestMapping(value = "/v1.0/reversal/telkomsel-postpaid", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    @RequestMapping(value = "/v1.0/reversal/telkomsel-prepaid", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public ResponseEntity<String> Multibiller(@Valid @RequestBody ReversalRequest reversalRequest,
                                               HttpServletRequest httpServletRequest,
                                               @RequestParam Map<String, Object> requestParam,
@@ -94,10 +96,10 @@ public class Reversal {
         String URI = env.getProperty("finnet.address") + env.getProperty("finnet.uri");
         String finnetAddress = env.getProperty("finnet.address");
         String finnetUri = env.getProperty("finnet.uri");
-//        String fee = env.getProperty("finnet.fee.telkomsel-postpaid");
+//        String fee = env.getProperty("finnet.fee.telkomsel-prepaid");
 //        String destinationAccount = env.getProperty("finnet.ss.destinationAccount");
 //        String feeAccount = env.getProperty("finnet.ss.feeAccount");
-        String validationProductCode = env.getProperty("finnet.productCode.telkomsel-postpaid");
+        String validationProductCode = env.getProperty("finnet.productCode.telkomsel-prepaid");
 
         DecimalFormat df = new DecimalFormat("#,###");
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
@@ -177,8 +179,6 @@ public class Reversal {
             if (map != null) {
 
                 String resppayment = map.get("responseCode");
-
-                log.info("NILAI resppayment --> " + resppayment);
 
                 reversalSuccess.setResponseCode(resppayment);
                 reversalSuccess.setResponseMessage(FinnetRCTextParser.parse(resppayment, ""));
@@ -333,3 +333,4 @@ public class Reversal {
     }
 
 }
+

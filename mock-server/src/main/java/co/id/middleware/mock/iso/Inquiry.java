@@ -58,9 +58,37 @@ public class Inquiry implements TransactionParticipant, Configurable {
 
         try {
 
-            message.set(4, "000000036999");
-            message.set(39, "00");
-            message.set(61, "0081294689020100001130829732610000000036999DWXXXXXXXANI                                                ");
+            switch (message.getString(103).trim()){
+
+                case "017001":
+//                    Postpaid XL
+                    message.set(4, "000000039388");
+                    message.set(39, "00");
+                    message.set(61, "00859399668981000601501928253       000000176157ANxxxxxxxxxxxNI               28082023");
+                    break;
+
+                case "019004":
+//                    Postpaid Smartfren
+                    message.set(4, "000000100909");
+                    message.set(39, "00");
+                    message.set(61, "0088905657655190004156100925551     000000100909ARI FIRMANSYAH                          20230821");
+                    break;
+
+                case "013000":
+//                    Postpaid Three
+                    message.set(4, "000000085101");
+                    message.set(39, "00");
+                    message.set(61, "00000000008988730292200004MUHAMMAD ROMADHONI                                29120022062037                          000000000020220000000851011DueDate             000020221101Date                202212290620Merchant            000000006016                    000000000000GetSubBillInfoxxxxxxfnt013");
+                    break;
+
+
+                default:
+//                    Postpaid Telkomsel Halo
+                    message.set(4, "000000229270");
+                    message.set(39, "00");
+                    message.set(61, "0081314153363100020130838548715000000229270SUXONO                                                      ");
+                    break;
+            }
 
             message.setResponseMTI();
             source.send(message);

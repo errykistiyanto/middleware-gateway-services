@@ -35,10 +35,10 @@ public class Selector implements GroupSelector, Configurable {
                     group = cfg.get (m.getMTI()+m.getString(70).trim());
                     break;
                 case "0200":
-                    group = cfg.get (m.getMTI()+m.getString(3));
+                    group = cfg.get (m.getMTI()+m.getString(3)+m.getString(103).trim());
                     break;
                 case "0400":
-                    group = cfg.get (m.getMTI()+m.getString(3));
+                    group = cfg.get (m.getMTI()+m.getString(3)+m.getString(103).trim());
                     break;
                 case "0420":
                     group = cfg.get (m.getMTI()+m.getString(3));

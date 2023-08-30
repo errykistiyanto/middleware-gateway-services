@@ -1,6 +1,9 @@
-package co.id.middleware.finnet.controller.postpaid.hallo;
+package co.id.middleware.finnet.controller.postpaid.three;
 
-import co.id.middleware.finnet.domain.inquiry.*;
+import co.id.middleware.finnet.domain.inquiry.InquiryFailed;
+import co.id.middleware.finnet.domain.inquiry.InquiryRequest;
+import co.id.middleware.finnet.domain.inquiry.InquiryResponse;
+import co.id.middleware.finnet.domain.inquiry.InquirySuccess;
 import co.id.middleware.finnet.repository.HistoryService;
 import co.id.middleware.finnet.utils.FinnetRCTextParser;
 import co.id.middleware.finnet.utils.Logging;
@@ -36,12 +39,12 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author errykistiyanto@gmail.com 2022-09-12
+ * @author briantomo80@gmail.com 25/08/23
  */
 
 @RestController
 @Slf4j
-@Component("InquiryPostpaidTelkomsel")
+@Component("InquiryPostpaidThree")
 public class Inquiry {
 
     @Autowired
@@ -69,8 +72,7 @@ public class Inquiry {
     public static final String out_resp = "outgoing response";
     //logstash message direction
 
-
-    @RequestMapping(value = "/v1.0/inquiry/telkomsel-postpaid", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    @RequestMapping(value = "/v1.0/inquiry/three-postpaid", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public ResponseEntity<String> multibiller(@Valid @RequestBody InquiryRequest inquiryRequest,
                                               HttpServletRequest httpServletRequest,
                                               @RequestParam Map<String, Object> requestParam,
@@ -96,10 +98,10 @@ public class Inquiry {
         String URI = env.getProperty("finnet.address") + env.getProperty("finnet.uri");
         String finnetAddress = env.getProperty("finnet.address");
         String finnetUri = env.getProperty("finnet.uri");
-        String fee = env.getProperty("finnet.fee.telkomsel-postpaid");
+        String fee = env.getProperty("finnet.fee.three-postpaid");
         String destinationAccount = env.getProperty("finnet.ss.destinationAccount");
         String feeAccount = env.getProperty("finnet.ss.feeAccount");
-        String validationProductCode = env.getProperty("finnet.productCode.telkomsel-postpaid");
+        String validationProductCode = env.getProperty("finnet.productCode.three-postpaid");
 
         DecimalFormat df = new DecimalFormat("#,###");
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
@@ -206,7 +208,7 @@ public class Inquiry {
             m.set(43, "BPD DKI                              IDN");
             m.set(49, "360");
             m.set(61, ISOUtil.zeropad(accountNumber, 13));
-            m.set(103, "010001");
+            m.set(103, "013000");
 
             // logstash
             Map<String, Object> mapRequestISO = new HashMap<>();
@@ -314,17 +316,17 @@ public class Inquiry {
                             return new ResponseEntity(inquiryFailed, HttpStatus.OK);
 
                         } else {
-                            screen.append("Telkomsel Halo");
+                            screen.append("Three Postpaid");
                             screen.append("|");
                             screen.append("|");
                             screen.append("No Handphone        : ");
                             screen.append("0" + Long.valueOf(accountNumber));
                             screen.append("|");
                             screen.append("Nama Pelanggan      : ");
-                            screen.append(resp.getString(61).substring(43, 88));
+                            screen.append(resp.getString(61).substring(26, 76));
                             screen.append("|");
                             screen.append("Referensi Tagihan   : ");
-                            screen.append(resp.getString(61).substring(20, 31)); //BILL REFERENCE
+                            screen.append(resp.getString(61).substring(291, 297)); //BILL REFERENCE
                             screen.append("|");
                             screen.append("Biaya Administrasi   : IDR "+df.format(Long.valueOf(fee)).replace(",", ".") + ",00");
                             screen.append("|");
@@ -580,5 +582,4 @@ public class Inquiry {
         }
 
     }
-
 }

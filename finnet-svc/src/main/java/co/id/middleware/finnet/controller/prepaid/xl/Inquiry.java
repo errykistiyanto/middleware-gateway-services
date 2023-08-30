@@ -1,6 +1,9 @@
-package co.id.middleware.finnet.controller.prepaid.telkomsel;
+package co.id.middleware.finnet.controller.prepaid.xl;
 
-import co.id.middleware.finnet.domain.inquiry.*;
+import co.id.middleware.finnet.domain.inquiry.InquiryFailed;
+import co.id.middleware.finnet.domain.inquiry.InquiryRequest;
+import co.id.middleware.finnet.domain.inquiry.InquiryResponse;
+import co.id.middleware.finnet.domain.inquiry.InquirySuccess;
 import co.id.middleware.finnet.repository.HistoryService;
 import co.id.middleware.finnet.utils.FinnetRCTextParser;
 import co.id.middleware.finnet.utils.Logging;
@@ -8,7 +11,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
-import org.jpos.iso.ISOUtil;
 import org.jpos.space.Space;
 import org.jpos.space.SpaceFactory;
 import org.jpos.space.SpaceUtil;
@@ -34,12 +36,12 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author errykistiyanto@gmail.com 2022-09-12
+ * @author briantomo80@gmail.com 23/08/23
  */
 
 @RestController
 @Slf4j
-@Component("InquiryPrepaidTelkomsel")
+@Component("InquiryPrepaidXL")
 public class Inquiry {
 
     @Autowired
@@ -68,7 +70,7 @@ public class Inquiry {
     //logstash message direction
 
 
-    @RequestMapping(value = "/v1.0/inquiry/telkomsel-prepaid", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    @RequestMapping(value = "/v1.0/inquiry/xl-prepaid", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public ResponseEntity<String> Multibiller(@Valid @RequestBody InquiryRequest inquiryRequest,
                                               HttpServletRequest httpServletRequest,
                                               @RequestParam Map<String, Object> requestParam,
@@ -94,10 +96,10 @@ public class Inquiry {
         String URI = env.getProperty("finnet.address") + env.getProperty("finnet.uri");
         String finnetAddress = env.getProperty("finnet.address");
         String finnetUri = env.getProperty("finnet.uri");
-        String fee = env.getProperty("finnet.fee.telkomsel-prepaid");
+        String fee = env.getProperty("finnet.fee.xl-prepaid");
         String destinationAccount = env.getProperty("finnet.ss.destinationAccount");
         String feeAccount = env.getProperty("finnet.ss.feeAccount");
-        String validationProductCode = env.getProperty("finnet.productCode.telkomsel-prepaid");
+        String validationProductCode = env.getProperty("finnet.productCode.xl-prepaid");
 
         DecimalFormat df = new DecimalFormat("#,###");
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
@@ -186,23 +188,12 @@ public class Inquiry {
 
             StringBuffer screen = new StringBuffer();
             switch (Integer.parseInt(amount)) {
-                case 15000:
-
-                case 20000:
 
                 case 25000:
 
-                case 30000:
-
-                case 40000:
-
                 case 50000:
 
-                case 75000:
-
                 case 100000:
-
-                case 150000:
 
                 case 200000:
 
@@ -211,7 +202,7 @@ public class Inquiry {
                 case 500000:
 
                 case 1000000:
-                    screen.append("Pembelian Telkomsel Prepaid");
+                    screen.append("XL Prepaid");
                     screen.append("|");
                     screen.append("|");
                     screen.append("Nomor Handphone      : "+"0"+Long.valueOf(accountNumber).toString());
@@ -219,12 +210,12 @@ public class Inquiry {
                     screen.append("Nominal              : IDR "+df.format(Long.valueOf(amount)).replace(",", ".") + ",00");
                     screen.append("|");
 
-                if (! channelCode.equals("6015")){ //!channelCode Open API
-                    screen.append("Biaya Administrasi   : IDR "+df.format(Long.valueOf(fee)).replace(",", ".") + ",00");
-                    screen.append("|");
-                    screen.append("Total Bayar          : IDR "+df.format(Long.valueOf(amount) + Long.valueOf(fee)).replace(",", ".") + ",00");
-                    screen.append("|");
-                }
+                    if (! channelCode.equals("6015")){ //!channelCode Open API
+                        screen.append("Biaya Administrasi   : IDR "+df.format(Long.valueOf(fee)).replace(",", ".") + ",00");
+                        screen.append("|");
+                        screen.append("Total Bayar          : IDR "+df.format(Long.valueOf(amount) + Long.valueOf(fee)).replace(",", ".") + ",00");
+                        screen.append("|");
+                    }
                     screen.append("|");
                     break;
 
@@ -339,5 +330,4 @@ public class Inquiry {
         }
 
     }
-
 }

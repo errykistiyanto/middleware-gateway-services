@@ -1,4 +1,4 @@
-package co.id.middleware.finnet.controller.postpaid.hallo;
+package co.id.middleware.finnet.controller.postpaid.xl;
 
 import co.id.middleware.finnet.domain.inquiry.*;
 import co.id.middleware.finnet.repository.HistoryService;
@@ -36,12 +36,12 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author errykistiyanto@gmail.com 2022-09-12
+ * @author briantomo80@gmail.com 25/08/23
  */
 
 @RestController
 @Slf4j
-@Component("InquiryPostpaidTelkomsel")
+@Component("InquiryPostpaidXL")
 public class Inquiry {
 
     @Autowired
@@ -69,8 +69,7 @@ public class Inquiry {
     public static final String out_resp = "outgoing response";
     //logstash message direction
 
-
-    @RequestMapping(value = "/v1.0/inquiry/telkomsel-postpaid", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    @RequestMapping(value = "/v1.0/inquiry/xl-postpaid", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public ResponseEntity<String> multibiller(@Valid @RequestBody InquiryRequest inquiryRequest,
                                               HttpServletRequest httpServletRequest,
                                               @RequestParam Map<String, Object> requestParam,
@@ -96,10 +95,10 @@ public class Inquiry {
         String URI = env.getProperty("finnet.address") + env.getProperty("finnet.uri");
         String finnetAddress = env.getProperty("finnet.address");
         String finnetUri = env.getProperty("finnet.uri");
-        String fee = env.getProperty("finnet.fee.telkomsel-postpaid");
+        String fee = env.getProperty("finnet.fee.xl-postpaid");
         String destinationAccount = env.getProperty("finnet.ss.destinationAccount");
         String feeAccount = env.getProperty("finnet.ss.feeAccount");
-        String validationProductCode = env.getProperty("finnet.productCode.telkomsel-postpaid");
+        String validationProductCode = env.getProperty("finnet.productCode.xl-postpaid");
 
         DecimalFormat df = new DecimalFormat("#,###");
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
@@ -206,7 +205,7 @@ public class Inquiry {
             m.set(43, "BPD DKI                              IDN");
             m.set(49, "360");
             m.set(61, ISOUtil.zeropad(accountNumber, 13));
-            m.set(103, "010001");
+            m.set(103, "017001");
 
             // logstash
             Map<String, Object> mapRequestISO = new HashMap<>();
@@ -314,14 +313,14 @@ public class Inquiry {
                             return new ResponseEntity(inquiryFailed, HttpStatus.OK);
 
                         } else {
-                            screen.append("Telkomsel Halo");
+                            screen.append("XL Postpaid");
                             screen.append("|");
                             screen.append("|");
                             screen.append("No Handphone        : ");
                             screen.append("0" + Long.valueOf(accountNumber));
                             screen.append("|");
                             screen.append("Nama Pelanggan      : ");
-                            screen.append(resp.getString(61).substring(43, 88));
+                            screen.append(resp.getString(61).substring(48, 78));
                             screen.append("|");
                             screen.append("Referensi Tagihan   : ");
                             screen.append(resp.getString(61).substring(20, 31)); //BILL REFERENCE
@@ -580,5 +579,4 @@ public class Inquiry {
         }
 
     }
-
 }

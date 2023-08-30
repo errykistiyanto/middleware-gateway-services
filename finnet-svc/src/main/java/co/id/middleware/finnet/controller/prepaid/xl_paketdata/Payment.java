@@ -1,4 +1,4 @@
-package co.id.middleware.finnet.controller.postpaid.hallo;
+package co.id.middleware.finnet.controller.prepaid.xl_paketdata;
 
 import co.id.middleware.finnet.domain.payment.*;
 import co.id.middleware.finnet.repository.HistoryService;
@@ -37,12 +37,12 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author errykistiyanto@gmail.com 2022-09-12
+ * @author briantomo80@gmail.com 24/08/23
  */
 
 @RestController
 @Slf4j
-@Component("PaymentPostpaidTelkomsel")
+@Component("PaymentPrepaidXLPaketData")
 public class Payment {
 
     @Autowired
@@ -70,7 +70,7 @@ public class Payment {
     public static final String out_resp = "outgoing response";
     //logstash message direction
 
-    @RequestMapping(value = "/v1.0/payment/telkomsel-postpaid", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    @RequestMapping(value = "/v1.0/payment/xl_paketdata-prepaid", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public ResponseEntity<String> Multibiller(@Valid @RequestBody PaymentRequest paymentRequest,
                                               HttpServletRequest httpServletRequest,
                                               @RequestParam Map<String, Object> requestParam,
@@ -96,10 +96,10 @@ public class Payment {
         String URI = env.getProperty("finnet.address") + env.getProperty("finnet.uri");
         String finnetAddress = env.getProperty("finnet.address");
         String finnetUri = env.getProperty("finnet.uri");
-//        String fee = env.getProperty("finnet.telkom.fee");
+//        String fee = env.getProperty("finnet.fee.xl_paketdata-prepaid");
 //        String destinationAccount = env.getProperty("finnet.ss.destinationAccount");
 //        String feeAccount = env.getProperty("finnet.ss.feeAccount");
-        String validationProductCode = env.getProperty("finnet.telkom.productCode");
+        String validationProductCode = env.getProperty("finnet.productCode.xl_paketdata-prepaid");
 
         SimpleDateFormat sdfDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date now = new Date();
@@ -194,8 +194,55 @@ public class Payment {
                 m.set(42, clientId);
                 m.set(43, "BPD DKI                              IDN");
                 m.set(49, "360");
-                m.set(61, redis_privateData);
-                m.set(103, "010001");
+
+                String kodelayanan = "";
+                switch (Integer.parseInt(m.getString(4))){
+                    case 30000:
+                        kodelayanan = "HR-BL-30K      ";
+                        break;
+                    case 60000:
+                        kodelayanan = "HR-BL-60K      ";
+                        break;
+                    case 120000:
+                        kodelayanan = "HR-BL-120K     ";
+                        break;
+                    case 50000:
+                        kodelayanan = "XP-BL-50K      ";
+                        break;
+                    case 59000:
+                        kodelayanan = "XP-BL-59K      ";
+                        break;
+                    case 89000:
+                        kodelayanan = "XP-BL-89K      ";
+                        break;
+                    case 129000:
+                        kodelayanan = "XP-BL-129K     ";
+                        break;
+                    case 179000:
+                        kodelayanan = "XP-BL-179K     ";
+                        break;
+                    case 239000:
+                        kodelayanan = "XP-BL-239K     ";
+                        break;
+                    case 69000:
+                        kodelayanan = "XP-BL-69K      ";
+                        break;
+                    case 99000:
+                        kodelayanan = "XP-BL-99K      ";
+                        break;
+                    case 139000:
+                        kodelayanan = "XP-BL-139K     ";
+                        break;
+                    case 189000:
+                        kodelayanan = "XP-BL-189K     ";
+                        break;
+                    case 249000:
+                        kodelayanan = "XP-BL-249K     ";
+                        break;
+                }
+
+                m.set(61, ISOUtil.zeropad(redis_privateData, 13) + kodelayanan);
+                m.set(103, "017003");
 
                 // logstash
                 Map<String, Object> mapRequestISO = new HashMap<>();
@@ -259,7 +306,7 @@ public class Payment {
 
                     StringBuffer screen = new StringBuffer();
                     if (resp.getString(39).equals("00")) {
-                        screen.append("Pembayaran Telkomsel Halo");
+                        screen.append("Pembelian XL Paket Data");
                         screen.append("|");
                         screen.append("|");
 
@@ -275,11 +322,11 @@ public class Payment {
                         screen.append("Nomor Handphone        : ");
                         screen.append("0" + Long.valueOf(resp.getString(61).substring(0, 13)));
                         screen.append("|");
-                        screen.append("Nama Pelanggan         : ");
-                        screen.append(redis_reserveData.substring(43, 88));
+                        screen.append("Nominal                : ");
+                        screen.append("IDR " + df.format(Long.valueOf(resp.getString(61).substring(28, 40))).replace(",", "."));
                         screen.append("|");
-                        screen.append("Nilai Tagihan          : ");
-                        screen.append("IDR " + df.format(Long.valueOf(resp.getString(4))).replace(",", ".") + ",00");
+                        screen.append("Harga                  : ");
+                        screen.append("IDR " + df.format(Long.valueOf(resp.getString(61).substring(28, 40))).replace(",", ".") + ",00");
                         screen.append("|");
 
                         if (!channelCode.equals("6015")){ //!channelCode Open API
@@ -287,24 +334,9 @@ public class Payment {
                             screen.append("IDR " + df.format(Long.valueOf(fee)).replace(",", ".") + ",00");
                             screen.append("|");
                             screen.append("Total Bayar         : ");
-                            screen.append("IDR " + df.format(Long.valueOf(resp.getString(4)) + Long.valueOf(fee)).replace(",", ".") + ",00");
+                            screen.append("IDR " + df.format(Long.valueOf(resp.getString(61).substring(28, 40)) + fee).replace(",", ".") + ",00");
                             screen.append("|");
                         }
-
-                        screen.append("|");
-                        screen.append("             Transaksi Berhasil");
-                        screen.append("|");
-                        screen.append("      PT Telkomsel NPWP 01.718.327.8.093.000");
-                        screen.append("|");
-                        screen.append(" Gedung Telkom Landmark Tower. Menara 1 LT.1 - 20");
-                        screen.append("|");
-                        screen.append("   Jl.Jend.Gatot Subroto Kav.52 Jakarta 12710");
-                        screen.append("|");
-                        screen.append("     Bila Ada Keluhan Hub 188 Dari Hp Anda");
-                        screen.append("|");
-                        screen.append("        Simpan Resi Ini Sebagai Bukti");
-                        screen.append("|");
-                        screen.append("        Pembelian Yang Sah, Berikut PPN");
 
                         paymentSuccess.setResponseCode(resp.getString(39));
                         paymentSuccess.setResponseMessage(FinnetRCTextParser.parse(resp.getString(39), ""));

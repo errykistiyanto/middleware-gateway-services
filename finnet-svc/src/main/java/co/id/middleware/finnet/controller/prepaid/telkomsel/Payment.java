@@ -1,6 +1,9 @@
-package co.id.middleware.finnet.controller.postpaid.hallo;
+package co.id.middleware.finnet.controller.prepaid.telkomsel;
 
-import co.id.middleware.finnet.domain.payment.*;
+import co.id.middleware.finnet.domain.payment.PaymentFailed;
+import co.id.middleware.finnet.domain.payment.PaymentRequest;
+import co.id.middleware.finnet.domain.payment.PaymentResponse;
+import co.id.middleware.finnet.domain.payment.PaymentSuccess;
 import co.id.middleware.finnet.repository.HistoryService;
 import co.id.middleware.finnet.utils.FinnetRCTextParser;
 import co.id.middleware.finnet.utils.Logging;
@@ -16,6 +19,7 @@ import org.jpos.q2.iso.QMUX;
 import org.jpos.space.Space;
 import org.jpos.space.SpaceFactory;
 import org.jpos.space.SpaceUtil;
+import org.jpos.util.Log;
 import org.jpos.util.NameRegistrar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -37,12 +41,12 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author errykistiyanto@gmail.com 2022-09-12
+ * @author briantomo80@gmail.com 22/08/23
  */
 
 @RestController
 @Slf4j
-@Component("PaymentPostpaidTelkomsel")
+@Component("PaymentPrepaidTelkomsel")
 public class Payment {
 
     @Autowired
@@ -70,10 +74,9 @@ public class Payment {
     public static final String out_resp = "outgoing response";
     //logstash message direction
 
-    @RequestMapping(value = "/v1.0/payment/telkomsel-postpaid", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    @RequestMapping(value = "/v1.0/payment/telkomsel-prepaid", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public ResponseEntity<String> Multibiller(@Valid @RequestBody PaymentRequest paymentRequest,
-                                              HttpServletRequest httpServletRequest,
-                                              @RequestParam Map<String, Object> requestParam,
+                                              HttpServletRequest httpServletRequest, @RequestParam Map<String, Object> requestParam,
                                               @RequestHeader Map<String, Object> requestHeader) throws JsonProcessingException {
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -96,10 +99,10 @@ public class Payment {
         String URI = env.getProperty("finnet.address") + env.getProperty("finnet.uri");
         String finnetAddress = env.getProperty("finnet.address");
         String finnetUri = env.getProperty("finnet.uri");
-//        String fee = env.getProperty("finnet.telkom.fee");
+//        String fee = env.getProperty("finnet.fee.telkomsel-prepaid");
 //        String destinationAccount = env.getProperty("finnet.ss.destinationAccount");
 //        String feeAccount = env.getProperty("finnet.ss.feeAccount");
-        String validationProductCode = env.getProperty("finnet.telkom.productCode");
+        String validationProductCode = env.getProperty("finnet.productCode.telkomsel-prepaid");
 
         SimpleDateFormat sdfDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date now = new Date();
@@ -194,8 +197,8 @@ public class Payment {
                 m.set(42, clientId);
                 m.set(43, "BPD DKI                              IDN");
                 m.set(49, "360");
-                m.set(61, redis_privateData);
-                m.set(103, "010001");
+                m.set(61, ISOUtil.zeropad(redis_privateData, 13));
+                m.set(103, "010002");
 
                 // logstash
                 Map<String, Object> mapRequestISO = new HashMap<>();
@@ -259,11 +262,15 @@ public class Payment {
 
                     StringBuffer screen = new StringBuffer();
                     if (resp.getString(39).equals("00")) {
-                        screen.append("Pembayaran Telkomsel Halo");
+
+                        log.info("SUKSES MASUK KE 00 -->");
+                        log.info("NILAI STAN --> " + resp.getString(11));
+
+                        screen.append("Pembelian Pulsa Telkomsel");
                         screen.append("|");
                         screen.append("|");
 
-                        if (! channelCode.equals("6015")){ //!channelCode Open API
+                        if (!channelCode.equals("6015")) { //!channelCode Open API
                             screen.append("Ref   : ");
                             screen.append(retrievalReferenceNumber);
                             screen.append("|");
@@ -275,21 +282,25 @@ public class Payment {
                         screen.append("Nomor Handphone        : ");
                         screen.append("0" + Long.valueOf(resp.getString(61).substring(0, 13)));
                         screen.append("|");
-                        screen.append("Nama Pelanggan         : ");
-                        screen.append(redis_reserveData.substring(43, 88));
+                        screen.append("Nominal                : ");
+                        screen.append("IDR " + df.format(Long.valueOf(resp.getString(61).substring(31, 43))).replace(",", "."));
                         screen.append("|");
-                        screen.append("Nilai Tagihan          : ");
-                        screen.append("IDR " + df.format(Long.valueOf(resp.getString(4))).replace(",", ".") + ",00");
+                        screen.append("Harga                  : ");
+                        screen.append("IDR " + df.format(Long.valueOf(resp.getString(61).substring(31, 43))).replace(",", ".") + ",00");
                         screen.append("|");
 
-                        if (!channelCode.equals("6015")){ //!channelCode Open API
+                        if (!channelCode.equals("6015")) { //!channelCode Open API
                             screen.append("Biaya Administrasi  : ");
                             screen.append("IDR " + df.format(Long.valueOf(fee)).replace(",", ".") + ",00");
                             screen.append("|");
                             screen.append("Total Bayar         : ");
-                            screen.append("IDR " + df.format(Long.valueOf(resp.getString(4)) + Long.valueOf(fee)).replace(",", ".") + ",00");
+                            screen.append("IDR " + df.format(Long.valueOf(resp.getString(61).substring(31, 43)) + Long.valueOf(fee)).replace(",", ".") + ",00");
                             screen.append("|");
                         }
+
+                        screen.append("Voucher S/N            : ");
+                        screen.append(resp.getString(61).substring(43, 59));
+                        screen.append("|");
 
                         screen.append("|");
                         screen.append("             Transaksi Berhasil");
@@ -332,6 +343,7 @@ public class Payment {
                         paymentResponse.setSourceAccount(sourceAccount);
                         paymentResponse.setProductName(productName);
                         paymentSuccess.setData(paymentResponse);
+
 
                         //logstash message custom
                         logging.restAPI(
@@ -518,7 +530,6 @@ public class Payment {
                 );
                 //logstash message custom
 
-
                 return new ResponseEntity(paymentFailed, HttpStatus.OK);
 
             } catch (NameRegistrar.NotFoundException e) {
@@ -575,6 +586,8 @@ public class Payment {
 
         } else {
 
+            log.info("SUKSES MASUK KE 12 -->");
+
             paymentFailed.setResponseCode("12");
             paymentFailed.setResponseMessage(FinnetRCTextParser.parse("12", ""));
             paymentRequest.setPan(pan);
@@ -623,7 +636,5 @@ public class Payment {
             return new ResponseEntity(paymentFailed, HttpStatus.OK);
 
         }
-
     }
-
 }

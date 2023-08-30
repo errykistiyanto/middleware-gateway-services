@@ -8,9 +8,40 @@
     <participant class="co.id.middleware.mock.jpos.Selector" logger="Q2">
         <property name="0800001"      value="LogOn"/>
         <property name="0800301"      value="Echo"/>
-        <property name="0200381099"   value="Inquiry"/>
-        <property name="0200501099"   value="Payment"/>
-        <property name="0400501099"   value="Reversal"/>
+
+        <property name="0200381099010001"   value="Inquiry"/> <!--Halo Telkomsel-->
+        <property name="0200381099010002"   value="Inquiry"/> <!--Prepaid Telkomsel-->
+        <property name="0200381099017000"   value="Inquiry"/> <!--Prepaid XL-->
+        <property name="0200381099017001"   value="Inquiry"/> <!--Postpaid XL-->
+        <property name="0200381099017003"   value="Inquiry"/> <!--Prepaid Paket Data XL-->
+        <property name="0200381099012000"   value="Inquiry"/> <!--Prepaid Three-->
+        <property name="0200381099013000"   value="Inquiry"/> <!--Postpaid Three-->
+        <property name="0200381099019003"   value="Inquiry"/> <!--Prepaid Smartfren-->
+        <property name="0200381099019004"   value="Inquiry"/> <!--Postpaid Smartfren-->
+        <property name="0200381099014000"   value="Inquiry"/> <!--Prepaid Indosat-->
+
+        <property name="0200501099010001"   value="Payment"/> <!--Halo Telkomsel-->
+        <property name="0200501099010002"   value="Payment"/> <!--Prepaid Telkomsel-->
+        <property name="0200501099017000"   value="Payment"/> <!--Prepaid XL-->
+        <property name="0200501099017001"   value="Payment"/> <!--Postpaid XL-->
+        <property name="0200501099017003"   value="Payment"/> <!--Prepaid Paket Data XL-->
+        <property name="0200501099012000"   value="Payment"/> <!--Prepaid Three-->
+        <property name="0200501099013000"   value="Payment"/> <!--Postpaid Three-->
+        <property name="0200501099019003"   value="Payment"/> <!--Prepaid Smartfren-->
+        <property name="0200501099019004"   value="Payment"/> <!--Postpaid Smartfren-->
+        <property name="0200501099014000"   value="Payment"/> <!--Prepaid Indosat-->
+
+        <property name="0400501099010001"   value="Reversal"/> <!--Halo Telkomsel-->
+        <property name="0400501099010002"   value="Reversal"/> <!--Prepaid Telkomsel-->
+        <property name="0400501099017000"   value="Reversal"/> <!--Prepaid XL-->
+        <property name="0400501099017001"   value="Reversal"/> <!--Postpaid XL-->
+        <property name="0400501099017003"   value="Reversal"/> <!--Prepaid Paket Data XL-->
+        <property name="0400501099012000"   value="Reversal"/> <!--Prepaid Three-->
+        <property name="0400501099013000"   value="Reversal"/> <!--Postpaid Three-->
+        <property name="0400501099019003"   value="Reversal"/> <!--Prepaid Smartfren-->
+        <property name="0400501099019004"   value="Reversal"/> <!--Postpaid Smartfren-->
+        <property name="0400501099014000"   value="Reversal"/> <!--Prepaid Indosat-->
+
         <property name="isorequest" value="REQUESTBILLER"/>
         <property name="isosource"  value="ISOBILLER"/>
         <property name="logger"     value="Q2"/>

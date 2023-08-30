@@ -1,6 +1,9 @@
-package co.id.middleware.finnet.controller.postpaid.hallo;
+package co.id.middleware.finnet.controller.postpaid.three;
 
-import co.id.middleware.finnet.domain.payment.*;
+import co.id.middleware.finnet.domain.payment.PaymentFailed;
+import co.id.middleware.finnet.domain.payment.PaymentRequest;
+import co.id.middleware.finnet.domain.payment.PaymentResponse;
+import co.id.middleware.finnet.domain.payment.PaymentSuccess;
 import co.id.middleware.finnet.repository.HistoryService;
 import co.id.middleware.finnet.utils.FinnetRCTextParser;
 import co.id.middleware.finnet.utils.Logging;
@@ -37,12 +40,12 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author errykistiyanto@gmail.com 2022-09-12
+ * @author briantomo80@gmail.com 25/08/23
  */
 
 @RestController
 @Slf4j
-@Component("PaymentPostpaidTelkomsel")
+@Component("PaymentPostpaidThree")
 public class Payment {
 
     @Autowired
@@ -70,7 +73,7 @@ public class Payment {
     public static final String out_resp = "outgoing response";
     //logstash message direction
 
-    @RequestMapping(value = "/v1.0/payment/telkomsel-postpaid", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    @RequestMapping(value = "/v1.0/payment/three-postpaid", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public ResponseEntity<String> Multibiller(@Valid @RequestBody PaymentRequest paymentRequest,
                                               HttpServletRequest httpServletRequest,
                                               @RequestParam Map<String, Object> requestParam,
@@ -96,10 +99,10 @@ public class Payment {
         String URI = env.getProperty("finnet.address") + env.getProperty("finnet.uri");
         String finnetAddress = env.getProperty("finnet.address");
         String finnetUri = env.getProperty("finnet.uri");
-//        String fee = env.getProperty("finnet.telkom.fee");
+//        String fee = env.getProperty("finnet.three.fee");
 //        String destinationAccount = env.getProperty("finnet.ss.destinationAccount");
 //        String feeAccount = env.getProperty("finnet.ss.feeAccount");
-        String validationProductCode = env.getProperty("finnet.telkom.productCode");
+        String validationProductCode = env.getProperty("finnet.three.productCode");
 
         SimpleDateFormat sdfDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date now = new Date();
@@ -195,7 +198,7 @@ public class Payment {
                 m.set(43, "BPD DKI                              IDN");
                 m.set(49, "360");
                 m.set(61, redis_privateData);
-                m.set(103, "010001");
+                m.set(103, "013000");
 
                 // logstash
                 Map<String, Object> mapRequestISO = new HashMap<>();
@@ -259,7 +262,7 @@ public class Payment {
 
                     StringBuffer screen = new StringBuffer();
                     if (resp.getString(39).equals("00")) {
-                        screen.append("Pembayaran Telkomsel Halo");
+                        screen.append("Pembayaran Three");
                         screen.append("|");
                         screen.append("|");
 
@@ -276,7 +279,7 @@ public class Payment {
                         screen.append("0" + Long.valueOf(resp.getString(61).substring(0, 13)));
                         screen.append("|");
                         screen.append("Nama Pelanggan         : ");
-                        screen.append(redis_reserveData.substring(43, 88));
+                        screen.append(redis_reserveData.substring(26, 76));
                         screen.append("|");
                         screen.append("Nilai Tagihan          : ");
                         screen.append("IDR " + df.format(Long.valueOf(resp.getString(4))).replace(",", ".") + ",00");
@@ -290,21 +293,6 @@ public class Payment {
                             screen.append("IDR " + df.format(Long.valueOf(resp.getString(4)) + Long.valueOf(fee)).replace(",", ".") + ",00");
                             screen.append("|");
                         }
-
-                        screen.append("|");
-                        screen.append("             Transaksi Berhasil");
-                        screen.append("|");
-                        screen.append("      PT Telkomsel NPWP 01.718.327.8.093.000");
-                        screen.append("|");
-                        screen.append(" Gedung Telkom Landmark Tower. Menara 1 LT.1 - 20");
-                        screen.append("|");
-                        screen.append("   Jl.Jend.Gatot Subroto Kav.52 Jakarta 12710");
-                        screen.append("|");
-                        screen.append("     Bila Ada Keluhan Hub 188 Dari Hp Anda");
-                        screen.append("|");
-                        screen.append("        Simpan Resi Ini Sebagai Bukti");
-                        screen.append("|");
-                        screen.append("        Pembelian Yang Sah, Berikut PPN");
 
                         paymentSuccess.setResponseCode(resp.getString(39));
                         paymentSuccess.setResponseMessage(FinnetRCTextParser.parse(resp.getString(39), ""));
@@ -625,5 +613,4 @@ public class Payment {
         }
 
     }
-
 }

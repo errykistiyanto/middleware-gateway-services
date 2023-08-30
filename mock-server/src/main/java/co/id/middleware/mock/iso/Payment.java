@@ -66,9 +66,78 @@ public class Payment implements TransactionParticipant, Configurable {
 
         try {
 
-            message.set(4, "000000036999");
-            message.set(39, "00");
-            message.set(61, "0081294689020100010130829732610000000036999");
+            switch (message.getString(103).trim()) {
+                case "010002":
+//                    Prepaid Telkomsel
+                    message.set(4, "000000050000");
+                    message.set(39, "00");
+                    message.set(61, "00821629694931000201230828160310000000500001400001239449884");
+                    break;
+
+                case "012000":
+//                    Prepaid Three
+                    message.set(4, "000000030000");
+                    message.set(39, "00");
+                    message.set(61, "0089532139628200003100000003000000000000E8SG272000c8    20230828210011621441");
+                    break;
+
+                case "013000":
+//                    Postpaid Three
+                    message.set(4, "000000085101");
+                    message.set(39, "00");
+                    message.set(61, "00000000008988730292200004MUHAMMAD ROMADHONI                                29120022062037                          000000000020220000000851011DueDate             000020221101Date                202212290620Merchant            000000006016                    000000000000GetSubBillInfoxxxxxxfnt013");
+                    break;
+
+                case "017000":
+//                    Prepaid XL
+                    message.set(4, "000000100000");
+                    message.set(39, "00");
+                    message.set(61, "0081904012392100050100000000   0000001000000092380828601990");
+                    break;
+
+                case "017001":
+//                    Postpaid XL
+                    message.set(4, "000000039388");
+                    message.set(39, "00");
+                    message.set(61, "008193929274510006012030958980      000000039388FIxxxxxNI                     ");
+                    break;
+
+                case "017003":
+//                    Prepaid Pake Data XL
+                    message.set(4, "000000060000");
+                    message.set(39, "00");
+                    message.set(61, "0087883678661HR-BL-60K      000000060000                  23082816021515  009018538020230828160215150000");
+                    break;
+
+                case "019003":
+//                    Prepaid Smartfren
+                    message.set(4, "000000100000");
+                    message.set(39, "00");
+                    message.set(61, "00888080072870190031000202308280000001000000000140561490585");
+                    break;
+
+                case "019004":
+//                    Postpaid Smartfren
+                    message.set(4, "000000100909");
+                    message.set(39, "00");
+                    message.set(61, "0088905657655190004156100925551     000000100909ARI FIRMANSYAH                          20230821");
+                    break;
+
+                case "014000":
+//                    Prepaid Indosat
+                    message.set(4, "000000100000");
+                    message.set(39, "00");
+                    message.set(61, "008880800711120000910002808202300000010000000000092380828601990000123456789");
+                    break;
+
+                default:
+//                    Postpaid Telkomsel Halo
+                    message.set(4, "000000229270");
+                    message.set(39, "00");
+                    message.set(61, "0081314153363100010130838548715000000229270");
+                    break;
+
+            }
 
             message.setResponseMTI();
             source.send(message);
