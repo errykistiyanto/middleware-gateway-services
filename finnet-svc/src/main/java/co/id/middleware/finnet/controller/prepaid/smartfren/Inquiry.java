@@ -7,6 +7,7 @@ import co.id.middleware.finnet.domain.inquiry.InquirySuccess;
 import co.id.middleware.finnet.repository.HistoryService;
 import co.id.middleware.finnet.utils.FinnetRCTextParser;
 import co.id.middleware.finnet.utils.Logging;
+import co.id.middleware.finnet.utils.ReceiptTransaction;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -58,6 +59,9 @@ public class Inquiry {
 
     @Autowired
     private Logging logging;
+
+    @Autowired
+    private ReceiptTransaction receiptTransaction;
 
     //logstash message direction
     public static final String service = "inquiry";
@@ -205,21 +209,31 @@ public class Inquiry {
                 case 300000:
 
                 case 500000:
-                    screen.append("Smartfren Prepaid");
-                    screen.append("|");
-                    screen.append("|");
-                    screen.append("Nomor Handphone      : "+"0"+Long.valueOf(accountNumber).toString());
-                    screen.append("|");
-                    screen.append("Nominal              : IDR "+df.format(Long.valueOf(amount)).replace(",", ".") + ",00");
-                    screen.append("|");
+
+                    screen.append(receiptTransaction.receiptHeader("Smartfren Prepaid"));
+                    screen.append(receiptTransaction.receiptInfo("Nomor Handphone", "0"+Long.valueOf(accountNumber).toString()));
+                    screen.append(receiptTransaction.receiptInfo("Nominal", "IDR " +df.format(Long.valueOf(amount)).replace(",", ".") + ",00"));
+
+//                    screen.append("Smartfren Prepaid");
+//                    screen.append("|");
+//                    screen.append("|");
+//                    screen.append("Nomor Handphone      : "+"0"+Long.valueOf(accountNumber).toString());
+//                    screen.append("|");
+//                    screen.append("Nominal              : IDR "+df.format(Long.valueOf(amount)).replace(",", ".") + ",00");
+//                    screen.append("|");
 
                     if (! channelCode.equals("6015")){ //!channelCode Open API
-                        screen.append("Biaya Administrasi   : IDR "+df.format(Long.valueOf(fee)).replace(",", ".") + ",00");
-                        screen.append("|");
-                        screen.append("Total Bayar          : IDR "+df.format(Long.valueOf(amount) + Long.valueOf(fee)).replace(",", ".") + ",00");
-                        screen.append("|");
+                        screen.append(receiptTransaction.receiptInfo("Biaya Administrasi", "IDR " +df.format(Long.valueOf(fee)).replace(",", ".") + ",00"));
+                        screen.append(receiptTransaction.receiptInfo("Nilai Tagihan", "IDR " + df.format(Long.valueOf(amount) + Long.valueOf(fee)).replace(",", ".") + ",00"));
+
+//                        screen.append("Biaya Administrasi   : IDR "+df.format(Long.valueOf(fee)).replace(",", ".") + ",00");
+//                        screen.append("|");
+//                        screen.append("Total Bayar          : IDR "+df.format(Long.valueOf(amount) + Long.valueOf(fee)).replace(",", ".") + ",00");
+//                        screen.append("|");
                     }
-                    screen.append("|");
+                    screen.append(receiptTransaction.noReceiptFooter());
+
+//                    screen.append("|");
                     break;
 
                 case 0:

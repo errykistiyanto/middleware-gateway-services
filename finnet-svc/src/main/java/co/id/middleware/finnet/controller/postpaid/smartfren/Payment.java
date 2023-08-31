@@ -7,6 +7,7 @@ import co.id.middleware.finnet.domain.payment.PaymentSuccess;
 import co.id.middleware.finnet.repository.HistoryService;
 import co.id.middleware.finnet.utils.FinnetRCTextParser;
 import co.id.middleware.finnet.utils.Logging;
+import co.id.middleware.finnet.utils.ReceiptTransaction;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -62,6 +63,9 @@ public class Payment {
 
     @Autowired
     private Logging logging;
+
+    @Autowired
+    private ReceiptTransaction receiptTransaction;
 
     //logstash message direction
     public static final String service = "payment";
@@ -262,37 +266,53 @@ public class Payment {
 
                     StringBuffer screen = new StringBuffer();
                     if (resp.getString(39).equals("00")) {
-                        screen.append("Pembayaran Smartfren");
-                        screen.append("|");
-                        screen.append("|");
+
+                        screen.append(receiptTransaction.receiptHeader("Pembayaran Smartfren"));
+
+//                        screen.append("Pembayaran Smartfren");
+//                        screen.append("|");
+//                        screen.append("|");
 
                         if (! channelCode.equals("6015")){ //!channelCode Open API
-                            screen.append("Ref   : ");
-                            screen.append(retrievalReferenceNumber);
-                            screen.append("|");
-                            screen.append("Waktu : ");
-                            screen.append((date) + " WIB");
-                            screen.append("|");
+                            screen.append(receiptTransaction.receiptInfo("Ref", retrievalReferenceNumber));
+                            screen.append(receiptTransaction.receiptInfo("Waktu", date + " WIB"));
+
+//                            screen.append("Ref   : ");
+//                            screen.append(retrievalReferenceNumber);
+//                            screen.append("|");
+//                            screen.append("Waktu : ");
+//                            screen.append((date) + " WIB");
+//                            screen.append("|");
                         }
 
-                        screen.append("Nomor Handphone        : ");
-                        screen.append("0" + Long.valueOf(resp.getString(61).substring(0, 13)));
-                        screen.append("|");
-                        screen.append("Nama Pelanggan         : ");
-                        screen.append(redis_reserveData.substring(48, 88));
-                        screen.append("|");
-                        screen.append("Nilai Tagihan          : ");
-                        screen.append("IDR " + df.format(Long.valueOf(resp.getString(4))).replace(",", ".") + ",00");
-                        screen.append("|");
+                        screen.append(receiptTransaction.receiptInfo("Nomor Handphone", "0" + Long.valueOf(resp.getString(61).substring(0, 13))));
+                        screen.append(receiptTransaction.receiptInfo("Nama Pelanggan", redis_reserveData.substring(48, 88)));
+                        screen.append(receiptTransaction.receiptInfo("Nilai Tagihan", "IDR " + df.format(Long.valueOf(resp.getString(4))).replace(",", ".") + ",00"));
+
+//                        screen.append("Nomor Handphone        : ");
+//                        screen.append("0" + Long.valueOf(resp.getString(61).substring(0, 13)));
+//                        screen.append("|");
+//                        screen.append("Nama Pelanggan         : ");
+//                        screen.append(redis_reserveData.substring(48, 88));
+//                        screen.append("|");
+//                        screen.append("Nilai Tagihan          : ");
+//                        screen.append("IDR " + df.format(Long.valueOf(resp.getString(4))).replace(",", ".") + ",00");
+//                        screen.append("|");
 
                         if (!channelCode.equals("6015")){ //!channelCode Open API
-                            screen.append("Biaya Administrasi  : ");
-                            screen.append("IDR " + df.format(Long.valueOf(fee)).replace(",", ".") + ",00");
-                            screen.append("|");
-                            screen.append("Total Bayar         : ");
-                            screen.append("IDR " + df.format(Long.valueOf(resp.getString(4)) + Long.valueOf(fee)).replace(",", ".") + ",00");
-                            screen.append("|");
+
+                            screen.append(receiptTransaction.receiptInfo("Biaya Administrasi", "IDR " + df.format(Long.valueOf(fee)).replace(",", ".") + ",00"));
+                            screen.append(receiptTransaction.receiptInfo("Total Bayar", "IDR " + df.format(Long.valueOf(resp.getString(4)) + Long.valueOf(fee)).replace(",", ".") + ",00"));
+
+//                            screen.append("Biaya Administrasi  : ");
+//                            screen.append("IDR " + df.format(Long.valueOf(fee)).replace(",", ".") + ",00");
+//                            screen.append("|");
+//                            screen.append("Total Bayar         : ");
+//                            screen.append("IDR " + df.format(Long.valueOf(resp.getString(4)) + Long.valueOf(fee)).replace(",", ".") + ",00");
+//                            screen.append("|");
                         }
+
+                        screen.append(receiptTransaction.noReceiptFooter());
 
                         paymentSuccess.setResponseCode(resp.getString(39));
                         paymentSuccess.setResponseMessage(FinnetRCTextParser.parse(resp.getString(39), ""));

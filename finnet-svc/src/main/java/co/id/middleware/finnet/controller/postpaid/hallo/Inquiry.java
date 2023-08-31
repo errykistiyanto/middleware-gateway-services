@@ -4,6 +4,7 @@ import co.id.middleware.finnet.domain.inquiry.*;
 import co.id.middleware.finnet.repository.HistoryService;
 import co.id.middleware.finnet.utils.FinnetRCTextParser;
 import co.id.middleware.finnet.utils.Logging;
+import co.id.middleware.finnet.utils.ReceiptTransaction;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -58,6 +59,9 @@ public class Inquiry {
 
     @Autowired
     private Logging logging;
+
+    @Autowired
+    private ReceiptTransaction receiptTransaction;
 
     //logstash message direction
     public static final String service = "inquiry";
@@ -314,24 +318,36 @@ public class Inquiry {
                             return new ResponseEntity(inquiryFailed, HttpStatus.OK);
 
                         } else {
-                            screen.append("Telkomsel Halo");
-                            screen.append("|");
-                            screen.append("|");
-                            screen.append("No Handphone        : ");
-                            screen.append("0" + Long.valueOf(accountNumber));
-                            screen.append("|");
-                            screen.append("Nama Pelanggan      : ");
-                            screen.append(resp.getString(61).substring(43, 88));
-                            screen.append("|");
-                            screen.append("Referensi Tagihan   : ");
-                            screen.append(resp.getString(61).substring(20, 31)); //BILL REFERENCE
-                            screen.append("|");
-                            screen.append("Biaya Administrasi   : IDR "+df.format(Long.valueOf(fee)).replace(",", ".") + ",00");
-                            screen.append("|");
-                            screen.append("Nilai Tagihan       : ");
-                            screen.append("IDR " + df.format(Long.valueOf(resp.getString(4))).replace(",", ".") + ",00"); // AMOUNT
-                            screen.append("|");
-                            screen.append("|");
+
+                            screen.append(receiptTransaction.receiptHeader("Telkomsel Halo"));
+                            screen.append(receiptTransaction.receiptInfo("Nomor Handphone", "0" + Long.valueOf(accountNumber)));
+                            screen.append(receiptTransaction.receiptInfo("Nama Pelanggan", resp.getString(61).substring(43, 88)));
+                            screen.append(receiptTransaction.receiptInfo("Referensi Tagihan", resp.getString(61).substring(20, 31)));
+                            screen.append(receiptTransaction.receiptInfo("Biaya Administrasi", "IDR " +df.format(Long.valueOf(fee)).replace(",", ".") + ",00"));
+                            screen.append(receiptTransaction.receiptInfo("Nilai Tagihan", "IDR " + df.format(Long.valueOf(resp.getString(4))).replace(",", ".") + ",00"));
+                            screen.append(receiptTransaction.noReceiptFooter());
+
+//                            HEADER RESI
+//                            screen.append("Telkomsel Halo");
+//                            screen.append("|");
+//                            screen.append("|");
+
+//                            INFO RESI
+//                            screen.append("No Handphone        : ");
+//                            screen.append("0" + Long.valueOf(accountNumber));
+//                            screen.append("|");
+//                            screen.append("Nama Pelanggan      : ");
+//                            screen.append(resp.getString(61).substring(43, 88));
+//                            screen.append("|");
+//                            screen.append("Referensi Tagihan   : ");
+//                            screen.append(resp.getString(61).substring(20, 31)); //BILL REFERENCE
+//                            screen.append("|");
+//                            screen.append("Biaya Administrasi   : IDR "+df.format(Long.valueOf(fee)).replace(",", ".") + ",00");
+//                            screen.append("|");
+//                            screen.append("Nilai Tagihan       : ");
+//                            screen.append("IDR " + df.format(Long.valueOf(resp.getString(4))).replace(",", ".") + ",00"); // AMOUNT
+//                            screen.append("|");
+//                            screen.append("|");
 
                             Gson gson4 = new Gson();
                             Map<String, String> map4 = new HashMap<>();

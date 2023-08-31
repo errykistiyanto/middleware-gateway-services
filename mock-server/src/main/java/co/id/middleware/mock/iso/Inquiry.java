@@ -64,7 +64,7 @@ public class Inquiry implements TransactionParticipant, Configurable {
 //                    Postpaid XL
                     message.set(4, "000000039388");
                     message.set(39, "00");
-                    message.set(61, "00859399668981000601501928253       000000176157ANxxxxxxxxxxxNI               28082023");
+                    message.set(61, "00812823879341000601501928253       000000176157ANxxxxxxxxxxxNI               ");
                     break;
 
                 case "019004":
@@ -86,7 +86,7 @@ public class Inquiry implements TransactionParticipant, Configurable {
 //                    Postpaid Telkomsel Halo
                     message.set(4, "000000229270");
                     message.set(39, "00");
-                    message.set(61, "0081314153363100020130838548715000000229270SUXONO                                                      ");
+                    message.set(61, "0081282387934100020130838548715000000229270SUXONO                                                      ");
                     break;
             }
 

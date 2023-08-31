@@ -85,7 +85,7 @@ public class Payment implements TransactionParticipant, Configurable {
 //                    Postpaid Three
                     message.set(4, "000000085101");
                     message.set(39, "00");
-                    message.set(61, "00000000008988730292200004MUHAMMAD ROMADHONI                                29120022062037                          000000000020220000000851011DueDate             000020221101Date                202212290620Merchant            000000006016                    000000000000GetSubBillInfoxxxxxxfnt013");
+                    message.set(61, "0000000008988730292200004MUHAMMAD ROMADHONI                                29120022062037                          000000000020220000000851011DueDate             000020221101Date                202212290620Merchant            000000006016                    000000000000GetSubBillInfoxxxxxxfnt013");
                     break;
 
                 case "017000":
@@ -99,7 +99,7 @@ public class Payment implements TransactionParticipant, Configurable {
 //                    Postpaid XL
                     message.set(4, "000000039388");
                     message.set(39, "00");
-                    message.set(61, "008193929274510006012030958980      000000039388FIxxxxxNI                     ");
+                    message.set(61, "00812823879341000601501928253       000000176157ANxxxxxxxxxxxNI               28082023");
                     break;
 
                 case "017003":
@@ -127,14 +127,14 @@ public class Payment implements TransactionParticipant, Configurable {
 //                    Prepaid Indosat
                     message.set(4, "000000100000");
                     message.set(39, "00");
-                    message.set(61, "008880800711120000910002808202300000010000000000092380828601990000123456789");
+                    message.set(61, "008880800728720000910002808202300000010000000000092380828601990000123456789");
                     break;
 
                 default:
 //                    Postpaid Telkomsel Halo
                     message.set(4, "000000229270");
                     message.set(39, "00");
-                    message.set(61, "0081314153363100010130838548715000000229270");
+                    message.set(61, "0081282387934100010130838548715000000229270");
                     break;
 
             }

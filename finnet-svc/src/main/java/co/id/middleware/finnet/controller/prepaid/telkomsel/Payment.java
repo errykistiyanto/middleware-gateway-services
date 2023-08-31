@@ -7,6 +7,7 @@ import co.id.middleware.finnet.domain.payment.PaymentSuccess;
 import co.id.middleware.finnet.repository.HistoryService;
 import co.id.middleware.finnet.utils.FinnetRCTextParser;
 import co.id.middleware.finnet.utils.Logging;
+import co.id.middleware.finnet.utils.ReceiptTransaction;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -63,6 +64,9 @@ public class Payment {
 
     @Autowired
     private Logging logging;
+
+    @Autowired
+    private ReceiptTransaction receiptTransaction;
 
     //logstash message direction
     public static final String service = "payment";
@@ -263,59 +267,77 @@ public class Payment {
                     StringBuffer screen = new StringBuffer();
                     if (resp.getString(39).equals("00")) {
 
-                        log.info("SUKSES MASUK KE 00 -->");
-                        log.info("NILAI STAN --> " + resp.getString(11));
+                        screen.append(receiptTransaction.receiptHeader("Pembelian Pulsa Telkomsel"));
 
-                        screen.append("Pembelian Pulsa Telkomsel");
-                        screen.append("|");
-                        screen.append("|");
-
-                        if (!channelCode.equals("6015")) { //!channelCode Open API
-                            screen.append("Ref   : ");
-                            screen.append(retrievalReferenceNumber);
-                            screen.append("|");
-                            screen.append("Waktu : ");
-                            screen.append((date) + " WIB");
-                            screen.append("|");
-                        }
-
-                        screen.append("Nomor Handphone        : ");
-                        screen.append("0" + Long.valueOf(resp.getString(61).substring(0, 13)));
-                        screen.append("|");
-                        screen.append("Nominal                : ");
-                        screen.append("IDR " + df.format(Long.valueOf(resp.getString(61).substring(31, 43))).replace(",", "."));
-                        screen.append("|");
-                        screen.append("Harga                  : ");
-                        screen.append("IDR " + df.format(Long.valueOf(resp.getString(61).substring(31, 43))).replace(",", ".") + ",00");
-                        screen.append("|");
+//                        screen.append("Pembelian Pulsa Telkomsel");
+//                        screen.append("|");
+//                        screen.append("|");
 
                         if (!channelCode.equals("6015")) { //!channelCode Open API
-                            screen.append("Biaya Administrasi  : ");
-                            screen.append("IDR " + df.format(Long.valueOf(fee)).replace(",", ".") + ",00");
-                            screen.append("|");
-                            screen.append("Total Bayar         : ");
-                            screen.append("IDR " + df.format(Long.valueOf(resp.getString(61).substring(31, 43)) + Long.valueOf(fee)).replace(",", ".") + ",00");
-                            screen.append("|");
+                            screen.append(receiptTransaction.receiptInfo("Ref", retrievalReferenceNumber));
+                            screen.append(receiptTransaction.receiptInfo("Waktu", date + " WIB"));
+
+//                            screen.append("Ref   : ");
+//                            screen.append(retrievalReferenceNumber);
+//                            screen.append("|");
+//                            screen.append("Waktu : ");
+//                            screen.append((date) + " WIB");
+//                            screen.append("|");
                         }
 
-                        screen.append("Voucher S/N            : ");
-                        screen.append(resp.getString(61).substring(43, 59));
-                        screen.append("|");
+                        screen.append(receiptTransaction.receiptInfo("Nomor Handphone", "0" + Long.valueOf(resp.getString(61).substring(0, 13))));
+                        screen.append(receiptTransaction.receiptInfo("Nominal", "IDR " + df.format(Long.valueOf(resp.getString(61).substring(31, 43))).replace(",", ".")));
+                        screen.append(receiptTransaction.receiptInfo("Harga", "IDR " + df.format(Long.valueOf(resp.getString(61).substring(31, 43))).replace(",", ".") + ",00"));
 
-                        screen.append("|");
-                        screen.append("             Transaksi Berhasil");
-                        screen.append("|");
-                        screen.append("      PT Telkomsel NPWP 01.718.327.8.093.000");
-                        screen.append("|");
-                        screen.append(" Gedung Telkom Landmark Tower. Menara 1 LT.1 - 20");
-                        screen.append("|");
-                        screen.append("   Jl.Jend.Gatot Subroto Kav.52 Jakarta 12710");
-                        screen.append("|");
-                        screen.append("     Bila Ada Keluhan Hub 188 Dari Hp Anda");
-                        screen.append("|");
-                        screen.append("        Simpan Resi Ini Sebagai Bukti");
-                        screen.append("|");
-                        screen.append("        Pembelian Yang Sah, Berikut PPN");
+//                        screen.append("Nomor Handphone        : ");
+//                        screen.append("0" + Long.valueOf(resp.getString(61).substring(0, 13)));
+//                        screen.append("|");
+//                        screen.append("Nominal                : ");
+//                        screen.append("IDR " + df.format(Long.valueOf(resp.getString(61).substring(31, 43))).replace(",", "."));
+//                        screen.append("|");
+//                        screen.append("Harga                  : ");
+//                        screen.append("IDR " + df.format(Long.valueOf(resp.getString(61).substring(31, 43))).replace(",", ".") + ",00");
+//                        screen.append("|");
+
+                        if (!channelCode.equals("6015")) { //!channelCode Open API
+                            screen.append(receiptTransaction.receiptInfo("Biaya Administrasi", "IDR " + df.format(Long.valueOf(fee)).replace(",", ".") + ",00"));
+                            screen.append(receiptTransaction.receiptInfo("Total Bayar", "IDR " + df.format(Long.valueOf(resp.getString(61).substring(31, 43)) + Long.valueOf(fee)).replace(",", ".") + ",00"));
+
+//                            screen.append("Biaya Administrasi  : ");
+//                            screen.append("IDR " + df.format(Long.valueOf(fee)).replace(",", ".") + ",00");
+//                            screen.append("|");
+//                            screen.append("Total Bayar         : ");
+//                            screen.append("IDR " + df.format(Long.valueOf(resp.getString(61).substring(31, 43)) + Long.valueOf(fee)).replace(",", ".") + ",00");
+//                            screen.append("|");
+                        }
+
+                        screen.append(receiptTransaction.receiptInfo("Voucher S/N", resp.getString(61).substring(43, 59)));
+                        screen.append(receiptTransaction.receiptFooter("Transaksi Berhasil"));
+                        screen.append(receiptTransaction.receiptFooter("PT Telkomsel NPWP 01.718.327.8.093.000"));
+                        screen.append(receiptTransaction.receiptFooter("Gedung Telkom Landmark Tower. Menara 1 LT.1 - 20"));
+                        screen.append(receiptTransaction.receiptFooter("Jl.Jend.Gatot Subroto Kav.52 Jakarta 12710"));
+                        screen.append(receiptTransaction.receiptFooter("Bila Ada Keluhan Hub 188 Dari Hp Anda"));
+                        screen.append(receiptTransaction.receiptFooter("Simpan Resi Ini Sebagai Bukti"));
+                        screen.append(receiptTransaction.receiptFooter("Pembelian Yang Sah, Berikut PPN"));
+
+//                        screen.append("Voucher S/N            : ");
+//                        screen.append(resp.getString(61).substring(43, 59));
+//                        screen.append("|");
+
+//                        screen.append("|");
+//                        screen.append("             Transaksi Berhasil");
+//                        screen.append("|");
+//                        screen.append("      PT Telkomsel NPWP 01.718.327.8.093.000");
+//                        screen.append("|");
+//                        screen.append(" Gedung Telkom Landmark Tower. Menara 1 LT.1 - 20");
+//                        screen.append("|");
+//                        screen.append("   Jl.Jend.Gatot Subroto Kav.52 Jakarta 12710");
+//                        screen.append("|");
+//                        screen.append("     Bila Ada Keluhan Hub 188 Dari Hp Anda");
+//                        screen.append("|");
+//                        screen.append("        Simpan Resi Ini Sebagai Bukti");
+//                        screen.append("|");
+//                        screen.append("        Pembelian Yang Sah, Berikut PPN");
 
                         paymentSuccess.setResponseCode(resp.getString(39));
                         paymentSuccess.setResponseMessage(FinnetRCTextParser.parse(resp.getString(39), ""));
