@@ -348,7 +348,7 @@ public class Inquiry {
                             Gson gson4 = new Gson();
                             Map<String, String> map4 = new HashMap<>();
 
-                            map4.put("privateData", resp.getString(61).substring(0, resp.getString(61).length() - 45)); //for request payment finnet
+                            map4.put("privateData", resp.getString(61)); //for request payment finnet
                             map4.put("reserveData", resp.getString(61)); // original response finnet
 
                             //save redis

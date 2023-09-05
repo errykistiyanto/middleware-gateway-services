@@ -81,6 +81,19 @@ public class Inquiry implements TransactionParticipant, Configurable {
                     message.set(61, "00000000008988730292200004MUHAMMAD ROMADHONI                                29120022062037                          000000000020220000000851011DueDate             000020221101Date                202212290620Merchant            000000006016                    000000000000GetSubBillInfoxxxxxxfnt013");
                     break;
 
+                case "001004":
+//                    OVO
+                    message.set(4, "000000075000");
+                    message.set(39, "00");
+                    message.set(61, "008890565765500000007500001OVO SYXXA FAXXXXH                                 ");
+                    break;
+
+                case "001025":
+//                    Gopay
+                    message.set(4, "000000080000");
+                    message.set(39, "00");
+                    message.set(61, "008890565765500000008000001OVO BRXXN FAXXXXH                                 ");
+                    break;
 
                 default:
 //                    Postpaid Telkomsel Halo

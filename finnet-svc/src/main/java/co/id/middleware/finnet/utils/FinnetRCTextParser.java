@@ -84,6 +84,10 @@ public class FinnetRCTextParser {
                 response = "Sorry for a while transaction can not be made";
                 break;
 
+            case "21":
+                response = "Transaction on process";
+                break;
+
         }
         return response;
     }

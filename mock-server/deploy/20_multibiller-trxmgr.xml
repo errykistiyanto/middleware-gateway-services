@@ -19,6 +19,8 @@
         <property name="0200381099019003"   value="Inquiry"/> <!--Prepaid Smartfren-->
         <property name="0200381099019004"   value="Inquiry"/> <!--Postpaid Smartfren-->
         <property name="0200381099014000"   value="Inquiry"/> <!--Prepaid Indosat-->
+        <property name="0200381099001004"   value="Inquiry"/> <!--Top Up OVO-->
+        <property name="0200381099001025"   value="Inquiry"/> <!--Top Up Gopay-->
 
         <property name="0200501099010001"   value="Payment"/> <!--Halo Telkomsel-->
         <property name="0200501099010002"   value="Payment"/> <!--Prepaid Telkomsel-->
@@ -30,6 +32,8 @@
         <property name="0200501099019003"   value="Payment"/> <!--Prepaid Smartfren-->
         <property name="0200501099019004"   value="Payment"/> <!--Postpaid Smartfren-->
         <property name="0200501099014000"   value="Payment"/> <!--Prepaid Indosat-->
+        <property name="0200501099001004"   value="Payment"/> <!--Top Up OVO-->
+        <property name="0200501099001025"   value="Payment"/> <!--Top Up Gopay-->
 
         <property name="0400501099010001"   value="Reversal"/> <!--Halo Telkomsel-->
         <property name="0400501099010002"   value="Reversal"/> <!--Prepaid Telkomsel-->
@@ -41,6 +45,8 @@
         <property name="0400501099019003"   value="Reversal"/> <!--Prepaid Smartfren-->
         <property name="0400501099019004"   value="Reversal"/> <!--Postpaid Smartfren-->
         <property name="0400501099014000"   value="Reversal"/> <!--Prepaid Indosat-->
+        <property name="0400501099001004"   value="Reversal"/> <!--Top Up OVO-->
+        <property name="0400501099001025"   value="Reversal"/> <!--Top Up Gopay-->
 
         <property name="isorequest" value="REQUESTBILLER"/>
         <property name="isosource"  value="ISOBILLER"/>

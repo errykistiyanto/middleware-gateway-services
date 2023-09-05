@@ -180,8 +180,8 @@ public class Reversal {
 
                 String resppayment = map.get("responseCode");
 
-                reversalSuccess.setResponseCode(resppayment);
-                reversalSuccess.setResponseMessage(FinnetRCTextParser.parse(resppayment, ""));
+                reversalSuccess.setResponseCode("00");
+                reversalSuccess.setResponseMessage(FinnetRCTextParser.parse("00", ""));
                 reversalResponse.setPan(pan);
                 reversalResponse.setStan(stan);
                 reversalResponse.setRetrievalReferenceNumber(retrievalReferenceNumber);

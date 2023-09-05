@@ -1,6 +1,9 @@
-package co.id.middleware.finnet.controller.postpaid.hallo;
+package co.id.middleware.finnet.controller.ewallet.gopay;
 
-import co.id.middleware.finnet.domain.inquiry.*;
+import co.id.middleware.finnet.domain.inquiry.InquiryFailed;
+import co.id.middleware.finnet.domain.inquiry.InquiryRequest;
+import co.id.middleware.finnet.domain.inquiry.InquiryResponse;
+import co.id.middleware.finnet.domain.inquiry.InquirySuccess;
 import co.id.middleware.finnet.repository.HistoryService;
 import co.id.middleware.finnet.utils.FinnetRCTextParser;
 import co.id.middleware.finnet.utils.Logging;
@@ -37,12 +40,12 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author errykistiyanto@gmail.com 2022-09-12
+ * @author briantomo80@gmail.com 02/09/23
  */
 
 @RestController
 @Slf4j
-@Component("InquiryPostpaidTelkomsel")
+@Component("InquiryGopay")
 public class Inquiry {
 
     @Autowired
@@ -73,8 +76,7 @@ public class Inquiry {
     public static final String out_resp = "outgoing response";
     //logstash message direction
 
-
-    @RequestMapping(value = "/v1.0/inquiry/telkomsel-hallo", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    @RequestMapping(value = "/v1.0/inquiry/gopay", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public ResponseEntity<String> multibiller(@Valid @RequestBody InquiryRequest inquiryRequest,
                                               HttpServletRequest httpServletRequest,
                                               @RequestParam Map<String, Object> requestParam,
@@ -100,10 +102,10 @@ public class Inquiry {
         String URI = env.getProperty("finnet.address") + env.getProperty("finnet.uri");
         String finnetAddress = env.getProperty("finnet.address");
         String finnetUri = env.getProperty("finnet.uri");
-        String fee = env.getProperty("finnet.fee.telkomsel-postpaid");
+        String fee = env.getProperty("finnet.fee.gopay");
         String destinationAccount = env.getProperty("finnet.ss.destinationAccount");
         String feeAccount = env.getProperty("finnet.ss.feeAccount");
-        String validationProductCode = env.getProperty("finnet.productCode.telkomsel-postpaid");
+        String validationProductCode = env.getProperty("finnet.productCode.gopay");
 
         DecimalFormat df = new DecimalFormat("#,###");
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
@@ -210,7 +212,7 @@ public class Inquiry {
             m.set(43, "BPD DKI                              IDN");
             m.set(49, "360");
             m.set(61, ISOUtil.zeropad(accountNumber, 13));
-            m.set(103, "010001");
+            m.set(103, "001025");
 
             // logstash
             Map<String, Object> mapRequestISO = new HashMap<>();
@@ -244,8 +246,6 @@ public class Inquiry {
 
             if (resp != null) {
 
-                log.info("RESP DITERIMA");
-
                 Map<String, Object> mapResponseISO = new HashMap<>();
                 for (int i = 0; i <= resp.getMaxField(); i++) {
                     if (resp.hasField(i)) {
@@ -274,147 +274,74 @@ public class Inquiry {
 
                 StringBuffer screen = new StringBuffer();
                 switch (resp.getString(39)) {
+
                     case "00":
 
-                        log.info("RESP SUKSES MASUK");
-                        if (resp.getString(4).equals("000000000000")) {
+                        screen.append(receiptTransaction.receiptHeader("Top Up Gopay"));
+                        screen.append(receiptTransaction.receiptInfo("Nomor Handphone", "0" + Long.valueOf(accountNumber)));
+                        screen.append(receiptTransaction.receiptInfo("Nama Pelanggan", resp.getString(61).substring(27, 57)));
+                        screen.append(receiptTransaction.receiptInfo("Biaya Administrasi", "IDR " +df.format(Long.valueOf(fee)).replace(",", ".") + ",00"));
+                        screen.append(receiptTransaction.receiptInfo("Nilai Tagihan", "IDR " + df.format(Long.valueOf(resp.getString(4))).replace(",", ".") + ",00"));
+                        screen.append(receiptTransaction.noReceiptFooter());
 
-                            inquiryFailed.setResponseCode("88"); // set already paid if case rc 00 & bit4 000000000000
-                            inquiryFailed.setResponseMessage(FinnetRCTextParser.parse("88", ""));
-                            inquiryRequest.setPan(pan);
-                            inquiryRequest.setStan(stan);
-                            inquiryRequest.setRetrievalReferenceNumber(retrievalReferenceNumber);
-                            inquiryRequest.setAmount(amount);
-                            inquiryRequest.setTransactionDateTime(transactionDateTime);
-                            inquiryRequest.setExpiredDate(expiredDate);
-                            inquiryRequest.setSettlementDate(settlementDate);
-                            inquiryRequest.setChannelCode(channelCode);
-                            inquiryRequest.setAcquiringCode(acquiringCode);
-                            inquiryRequest.setForwardingCode(forwardingCode);
-                            inquiryRequest.setTerminalId(terminalId);
-                            inquiryRequest.setClientId(clientId);
-                            inquiryRequest.setLocationName(locationName);
-                            inquiryRequest.setTransactionYear(transactionYear);
-                            inquiryRequest.setProductCode(productCode);
-                            inquiryRequest.setAccountNumber(accountNumber);
-                            inquiryRequest.setProductName(productName);
-                            inquiryFailed.setData(inquiryRequest);
+                        Gson gson4 = new Gson();
+                        Map<String, String> map4 = new HashMap<>();
 
-                            //logstash message custom
-                            logging.restAPI(
-                                    "" + service,
-                                    "",
-                                    resp_to + "gateway",
-                                    "" + retrievalReferenceNumber,
-                                    "" + accountNumber,
-                                    "" + "finnet-svc",
-                                    inquiryFailed,
-                                    header,
-                                    param,
-                                    "",
-                                    "",
-                                    "",
-                                    "",
-                                    "" + HttpStatus.OK
-                            );
-                            //logstash message custom
+                        map4.put("privateData", resp.getString(61)); //for request payment finnet
+                        map4.put("reserveData", resp.getString(61)); // original response finnet
 
-                            return new ResponseEntity(inquiryFailed, HttpStatus.OK);
+                        //save redis
+                        ValueOperations<String, String> values = redisTemplate.opsForValue();
+                        values.set("co:id:bankdki:openapi:multibiller:" + clientId + uuid, gson4.toJson(map4), 30, TimeUnit.MINUTES); //30 minutes for test only, prod 1 minutes
 
-                        } else {
-                            log.info("MASUK ke RECEIPT");
+                        log.info("redis set " + "co:id:bankdki:openapi:multibiller:" + clientId + uuid);
 
-                            screen.append(receiptTransaction.receiptHeader("Telkomsel Halo"));
-                            screen.append(receiptTransaction.receiptInfo("Nomor Handphone", "0" + Long.valueOf(accountNumber)));
-                            screen.append(receiptTransaction.receiptInfo("Nama Pelanggan", resp.getString(61).substring(43, 88)));
-                            screen.append(receiptTransaction.receiptInfo("Referensi Tagihan", resp.getString(61).substring(20, 31)));
-                            screen.append(receiptTransaction.receiptInfo("Biaya Administrasi", "IDR " +df.format(Long.valueOf(fee)).replace(",", ".") + ",00"));
-                            screen.append(receiptTransaction.receiptInfo("Nilai Tagihan", "IDR " + df.format(Long.valueOf(resp.getString(4))).replace(",", ".") + ",00"));
-                            screen.append(receiptTransaction.noReceiptFooter());
+                        inquirySuccess.setResponseCode(resp.getString(39));
+                        inquirySuccess.setResponseMessage(FinnetRCTextParser.parse(resp.getString(39), ""));
+                        inquiryResponse.setPan(pan);
+                        inquiryResponse.setStan(stan);
+                        inquiryResponse.setRetrievalReferenceNumber(retrievalReferenceNumber);
+                        inquiryResponse.setAmount(resp.getString(4).replaceFirst("^0+(?!$)", ""));
+                        inquiryResponse.setTransactionDateTime(transactionDateTime);
+                        inquiryResponse.setExpiredDate(expiredDate);
+                        inquiryResponse.setSettlementDate(settlementDate);
+                        inquiryResponse.setChannelCode(channelCode);
+                        inquiryResponse.setAcquiringCode(acquiringCode);
+                        inquiryResponse.setForwardingCode(forwardingCode);
+                        inquiryResponse.setTerminalId(terminalId);
+                        inquiryResponse.setClientId(clientId);
+                        inquiryResponse.setLocationName(locationName);
+                        inquiryResponse.setPrivateData(uuid);
+                        inquiryResponse.setScreen(screen.toString());
+                        inquiryResponse.setTransactionYear(transactionYear);
+                        inquiryResponse.setProductCode(productCode);
+                        inquiryResponse.setAccountNumber(accountNumber);
+                        inquiryResponse.setFee(fee);
+                        inquiryResponse.setDestinationAccount(destinationAccount);
+                        inquiryResponse.setFeeAccount(feeAccount);
+                        inquiryResponse.setProductName(productName);
+                        inquirySuccess.setData(inquiryResponse);
 
-//                            HEADER RESI
-//                            screen.append("Telkomsel Halo");
-//                            screen.append("|");
-//                            screen.append("|");
+                        //logstash message custom
+                        logging.restAPI(
+                                "" + service,
+                                "",
+                                resp_to + "gateway",
+                                "" + retrievalReferenceNumber,
+                                "" + accountNumber,
+                                "" + "finnet-svc",
+                                inquirySuccess,
+                                header,
+                                param,
+                                "",
+                                "",
+                                "",
+                                "",
+                                "" + HttpStatus.OK
+                        );
+                        //logstash message custom
 
-//                            INFO RESI
-//                            screen.append("No Handphone        : ");
-//                            screen.append("0" + Long.valueOf(accountNumber));
-//                            screen.append("|");
-//                            screen.append("Nama Pelanggan      : ");
-//                            screen.append(resp.getString(61).substring(43, 88));
-//                            screen.append("|");
-//                            screen.append("Referensi Tagihan   : ");
-//                            screen.append(resp.getString(61).substring(20, 31)); //BILL REFERENCE
-//                            screen.append("|");
-//                            screen.append("Biaya Administrasi   : IDR "+df.format(Long.valueOf(fee)).replace(",", ".") + ",00");
-//                            screen.append("|");
-//                            screen.append("Nilai Tagihan       : ");
-//                            screen.append("IDR " + df.format(Long.valueOf(resp.getString(4))).replace(",", ".") + ",00"); // AMOUNT
-//                            screen.append("|");
-//                            screen.append("|");
-
-                            Gson gson4 = new Gson();
-                            Map<String, String> map4 = new HashMap<>();
-
-                            map4.put("privateData", resp.getString(61).substring(0, resp.getString(61).length() - 45)); //for request payment finnet
-                            map4.put("reserveData", resp.getString(61)); // original response finnet
-
-                            System.out.println("reserveData "+resp.getString(61));
-
-                            //save redis
-                            ValueOperations<String, String> values = redisTemplate.opsForValue();
-                            values.set("co:id:bankdki:openapi:multibiller:" + clientId + uuid, gson4.toJson(map4), 1, TimeUnit.DAYS); //30 minutes for test only, prod 1 minutes
-
-                            log.info("redis set " + "co:id:bankdki:openapi:multibiller:" + clientId + uuid);
-
-                            inquirySuccess.setResponseCode(resp.getString(39));
-                            inquirySuccess.setResponseMessage(FinnetRCTextParser.parse(resp.getString(39), ""));
-                            inquiryResponse.setPan(pan);
-                            inquiryResponse.setStan(stan);
-                            inquiryResponse.setRetrievalReferenceNumber(retrievalReferenceNumber);
-                            inquiryResponse.setAmount(resp.getString(4).replaceFirst("^0+(?!$)", ""));
-                            inquiryResponse.setTransactionDateTime(transactionDateTime);
-                            inquiryResponse.setExpiredDate(expiredDate);
-                            inquiryResponse.setSettlementDate(settlementDate);
-                            inquiryResponse.setChannelCode(channelCode);
-                            inquiryResponse.setAcquiringCode(acquiringCode);
-                            inquiryResponse.setForwardingCode(forwardingCode);
-                            inquiryResponse.setTerminalId(terminalId);
-                            inquiryResponse.setClientId(clientId);
-                            inquiryResponse.setLocationName(locationName);
-                            inquiryResponse.setPrivateData(uuid);
-                            inquiryResponse.setScreen(screen.toString());
-                            inquiryResponse.setTransactionYear(transactionYear);
-                            inquiryResponse.setProductCode(productCode);
-                            inquiryResponse.setAccountNumber(accountNumber);
-                            inquiryResponse.setFee(fee);
-                            inquiryResponse.setDestinationAccount(destinationAccount);
-                            inquiryResponse.setFeeAccount(feeAccount);
-                            inquiryResponse.setProductName(productName);
-                            inquirySuccess.setData(inquiryResponse);
-
-                            //logstash message custom
-                            logging.restAPI(
-                                    "" + service,
-                                    "",
-                                    resp_to + "gateway",
-                                    "" + retrievalReferenceNumber,
-                                    "" + accountNumber,
-                                    "" + "finnet-svc",
-                                    inquirySuccess,
-                                    header,
-                                    param,
-                                    "",
-                                    "",
-                                    "",
-                                    "",
-                                    "" + HttpStatus.OK
-                            );
-                            //logstash message custom
-
-                            return new ResponseEntity(inquirySuccess, HttpStatus.OK);
-                        }
+                        return new ResponseEntity(inquirySuccess, HttpStatus.OK);
 
                     default:
 
@@ -603,5 +530,4 @@ public class Inquiry {
         }
 
     }
-
 }

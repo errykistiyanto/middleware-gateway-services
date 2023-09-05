@@ -109,6 +109,20 @@ public class Payment implements TransactionParticipant, Configurable {
                     message.set(61, "0087883678661HR-BL-60K      000000060000                  23082816021515  009018538020230828160215150000");
                     break;
 
+                case "001004":
+//                    OVO
+                    message.set(4, "000000075000");
+                    message.set(39, "00");
+                    message.set(61, "008890565765500000007500001OVO SYXXA FAXXXXH                                 102092023095944");
+                    break;
+
+                case "001025":
+//                    Gopay
+                    message.set(4, "000000080000");
+                    message.set(39, "00");
+                    message.set(61, "008890565765500000008000001OVO BRXXN FAXXXXH                                 702818288818128");
+                    break;
+
                 case "019003":
 //                    Prepaid Smartfren
                     message.set(4, "000000100000");
@@ -133,7 +147,7 @@ public class Payment implements TransactionParticipant, Configurable {
                 default:
 //                    Postpaid Telkomsel Halo
                     message.set(4, "000000229270");
-                    message.set(39, "00");
+                    message.set(39, "80");
                     message.set(61, "0081282387934100010130838548715000000229270");
                     break;
 

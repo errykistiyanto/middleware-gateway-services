@@ -1,6 +1,9 @@
-package co.id.middleware.finnet.controller.postpaid.hallo;
+package co.id.middleware.finnet.controller.ewallet.shopeepay;
 
-import co.id.middleware.finnet.domain.payment.*;
+import co.id.middleware.finnet.domain.payment.PaymentFailed;
+import co.id.middleware.finnet.domain.payment.PaymentRequest;
+import co.id.middleware.finnet.domain.payment.PaymentResponse;
+import co.id.middleware.finnet.domain.payment.PaymentSuccess;
 import co.id.middleware.finnet.repository.HistoryService;
 import co.id.middleware.finnet.utils.FinnetRCTextParser;
 import co.id.middleware.finnet.utils.Logging;
@@ -38,12 +41,12 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author errykistiyanto@gmail.com 2022-09-12
+ * @author briantomo80@gmail.com 05/09/23
  */
 
 @RestController
 @Slf4j
-@Component("PaymentPostpaidTelkomsel")
+@Component("PaymentShopeepay")
 public class Payment {
 
     @Autowired
@@ -74,10 +77,9 @@ public class Payment {
     public static final String out_resp = "outgoing response";
     //logstash message direction
 
-    @RequestMapping(value = "/v1.0/payment/telkomsel-postpaid", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    @RequestMapping(value = "/v1.0/payment/shopeepay", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public ResponseEntity<String> Multibiller(@Valid @RequestBody PaymentRequest paymentRequest,
-                                              HttpServletRequest httpServletRequest,
-                                              @RequestParam Map<String, Object> requestParam,
+                                              HttpServletRequest httpServletRequest, @RequestParam Map<String, Object> requestParam,
                                               @RequestHeader Map<String, Object> requestHeader) throws JsonProcessingException {
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -100,10 +102,10 @@ public class Payment {
         String URI = env.getProperty("finnet.address") + env.getProperty("finnet.uri");
         String finnetAddress = env.getProperty("finnet.address");
         String finnetUri = env.getProperty("finnet.uri");
-//        String fee = env.getProperty("finnet.fee.telkomsel-postpaid");
+//        String fee = env.getProperty("finnet.fee.shopeepay");
 //        String destinationAccount = env.getProperty("finnet.ss.destinationAccount");
 //        String feeAccount = env.getProperty("finnet.ss.feeAccount");
-        String validationProductCode = env.getProperty("finnet.productCode.telkomsel-postpaid");
+        String validationProductCode = env.getProperty("finnet.productCode.shopeepay");
 
         SimpleDateFormat sdfDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date now = new Date();
@@ -198,8 +200,8 @@ public class Payment {
                 m.set(42, clientId);
                 m.set(43, "BPD DKI                              IDN");
                 m.set(49, "360");
-                m.set(61, redis_privateData);
-                m.set(103, "010001");
+                m.set(61, ISOUtil.zeropad(redis_privateData, 13));
+                m.set(103, "001028");
 
                 // logstash
                 Map<String, Object> mapRequestISO = new HashMap<>();
@@ -264,72 +266,24 @@ public class Payment {
                     StringBuffer screen = new StringBuffer();
                     if (resp.getString(39).equals("00")) {
 
-                        screen.append(receiptTransaction.receiptHeader("Pembayaran Telkomsel Halo"));
-//                        screen.append("Pembayaran Telkomsel Halo");
-//                        screen.append("|");
-//                        screen.append("|");
+                        screen.append(receiptTransaction.receiptHeader("Pembayaran Top Up Shopeepay"));
 
-                        if (! channelCode.equals("6015")){ //!channelCode Open API
+                        if (!channelCode.equals("6015")) { //!channelCode Open API
                             screen.append(receiptTransaction.receiptInfo("Ref", retrievalReferenceNumber));
                             screen.append(receiptTransaction.receiptInfo("Waktu", date + " WIB"));
-//
-//                            screen.append("Ref   : ");
-//                            screen.append(retrievalReferenceNumber);
-//                            screen.append("|");
-//                            screen.append("Waktu : ");
-//                            screen.append((date) + " WIB");
-//                            screen.append("|");
                         }
 
                         screen.append(receiptTransaction.receiptInfo("Nomor Handphone", "0" + Long.valueOf(resp.getString(61).substring(0, 13))));
-                        screen.append(receiptTransaction.receiptInfo("Nama Pelanggan", redis_reserveData.substring(43, 88)));
+                        screen.append(receiptTransaction.receiptInfo("Nama Pelanggan", resp.getString(61).substring(27, 57)));
                         screen.append(receiptTransaction.receiptInfo("Nilai Tagihan", "IDR " + df.format(Long.valueOf(resp.getString(4))).replace(",", ".") + ",00"));
 
-//                        screen.append("Nomor Handphone        : ");
-//                        screen.append("0" + Long.valueOf(resp.getString(61).substring(0, 13)));
-//                        screen.append("|");
-//                        screen.append("Nama Pelanggan         : ");
-//                        screen.append(redis_reserveData.substring(43, 88));
-//                        screen.append("|");
-//                        screen.append("Nilai Tagihan          : ");
-//                        screen.append("IDR " + df.format(Long.valueOf(resp.getString(4))).replace(",", ".") + ",00");
-//                        screen.append("|");
-
-                        if (!channelCode.equals("6015")){ //!channelCode Open API
-
+                        if (!channelCode.equals("6015")) { //!channelCode Open API
                             screen.append(receiptTransaction.receiptInfo("Biaya Administrasi", "IDR " + df.format(Long.valueOf(fee)).replace(",", ".") + ",00"));
                             screen.append(receiptTransaction.receiptInfo("Total Bayar", "IDR " + df.format(Long.valueOf(resp.getString(4)) + Long.valueOf(fee)).replace(",", ".") + ",00"));
-
-//                            screen.append("Biaya Administrasi  : ");
-//                            screen.append("IDR " + df.format(Long.valueOf(fee)).replace(",", ".") + ",00");
-//                            screen.append("|");
-//                            screen.append("Total Bayar         : ");
-//                            screen.append("IDR " + df.format(Long.valueOf(resp.getString(4)) + Long.valueOf(fee)).replace(",", ".") + ",00");
-//                            screen.append("|");
                         }
 
-                        screen.append(receiptTransaction.receiptFooter("Transaksi Berhasil"));
-                        screen.append(receiptTransaction.receiptFooter("PT Telkomsel NPWP 01.718.327.8.093.000"));
-                        screen.append(receiptTransaction.receiptFooter("Gedung Telkom Landmark Tower. Menara 1 LT.1 - 20"));
-                        screen.append(receiptTransaction.receiptFooter("Jl.Jend.Gatot Subroto Kav.52 Jakarta 12710"));
-                        screen.append(receiptTransaction.receiptFooter("Bila Ada Keluhan Hub 188 Dari Hp Anda"));
-                        screen.append(receiptTransaction.receiptFooter("Simpan Resi Ini Sebagai Bukti"));
-                        screen.append(receiptTransaction.receiptFooter("Pembelian Yang Sah, Berikut PPN"));
-
-//                        screen.append("|");
-//                        screen.append("             Transaksi Berhasil");
-//                        screen.append("|");
-//                        screen.append("      PT Telkomsel NPWP 01.718.327.8.093.000");
-//                        screen.append("|");
-//                        screen.append(" Gedung Telkom Landmark Tower. Menara 1 LT.1 - 20");
-//                        screen.append("|");
-//                        screen.append("   Jl.Jend.Gatot Subroto Kav.52 Jakarta 12710");
-//                        screen.append("|");
-//                        screen.append("     Bila Ada Keluhan Hub 188 Dari Hp Anda");
-//                        screen.append("|");
-//                        screen.append("        Simpan Resi Ini Sebagai Bukti");
-//                        screen.append("|");
-//                        screen.append("        Pembelian Yang Sah, Berikut PPN");
+                        screen.append(receiptTransaction.receiptInfo("Voucher S/N", resp.getString(61).substring(77, 205).trim()));
+                        screen.append(receiptTransaction.noReceiptFooter());
 
                         paymentSuccess.setResponseCode(resp.getString(39));
                         paymentSuccess.setResponseMessage(FinnetRCTextParser.parse(resp.getString(39), ""));
@@ -357,6 +311,7 @@ public class Payment {
                         paymentResponse.setSourceAccount(sourceAccount);
                         paymentResponse.setProductName(productName);
                         paymentSuccess.setData(paymentResponse);
+
 
                         //logstash message custom
                         logging.restAPI(
@@ -543,7 +498,6 @@ public class Payment {
                 );
                 //logstash message custom
 
-
                 return new ResponseEntity(paymentFailed, HttpStatus.OK);
 
             } catch (NameRegistrar.NotFoundException e) {
@@ -600,6 +554,8 @@ public class Payment {
 
         } else {
 
+            log.info("SUKSES MASUK KE 12 -->");
+
             paymentFailed.setResponseCode("12");
             paymentFailed.setResponseMessage(FinnetRCTextParser.parse("12", ""));
             paymentRequest.setPan(pan);
@@ -648,7 +604,5 @@ public class Payment {
             return new ResponseEntity(paymentFailed, HttpStatus.OK);
 
         }
-
     }
-
 }

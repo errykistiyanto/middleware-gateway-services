@@ -179,8 +179,8 @@ public class Reversal {
 
                 log.info("NILAI resppayment --> " + resppayment);
 
-                reversalSuccess.setResponseCode(resppayment);
-                reversalSuccess.setResponseMessage(FinnetRCTextParser.parse(resppayment, ""));
+                reversalSuccess.setResponseCode("00");
+                reversalSuccess.setResponseMessage(FinnetRCTextParser.parse("00", ""));
                 reversalResponse.setPan(pan);
                 reversalResponse.setStan(stan);
                 reversalResponse.setRetrievalReferenceNumber(retrievalReferenceNumber);
