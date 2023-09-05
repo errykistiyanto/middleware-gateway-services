@@ -130,6 +130,13 @@ public class Payment implements TransactionParticipant, Configurable {
                     message.set(61, "008123645128300000011500001DANA BRXXN FAXXXXH                                201033025646646");
                     break;
 
+                case "001028":
+//                    Shopeepay
+                    message.set(4, "000000150000");
+                    message.set(39, "00");
+                    message.set(61, "008125532413300000015000001SHOPEEPAY BRXXN FAXXXXH                           103033025771123");
+                    break;
+
                 case "019003":
 //                    Prepaid Smartfren
                     message.set(4, "000000100000");
