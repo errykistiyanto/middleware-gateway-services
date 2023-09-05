@@ -120,7 +120,14 @@ public class Payment implements TransactionParticipant, Configurable {
 //                    Gopay
                     message.set(4, "000000080000");
                     message.set(39, "00");
-                    message.set(61, "008890565765500000008000001OVO BRXXN FAXXXXH                                 702818288818128");
+                    message.set(61, "008120565120100000005000001GOPAY ALXXN FAXXXXH                               103032023012747");
+                    break;
+
+                case "001024":
+//                    Dana
+                    message.set(4, "000000115000");
+                    message.set(39, "00");
+                    message.set(61, "008123645128300000011500001DANA BRXXN FAXXXXH                                201033025646646");
                     break;
 
                 case "019003":

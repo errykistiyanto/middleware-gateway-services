@@ -21,6 +21,8 @@
         <property name="0200381099014000"   value="Inquiry"/> <!--Prepaid Indosat-->
         <property name="0200381099001004"   value="Inquiry"/> <!--Top Up OVO-->
         <property name="0200381099001025"   value="Inquiry"/> <!--Top Up Gopay-->
+        <property name="0200381099001024"   value="Inquiry"/> <!--Top Up Dana-->
+        <property name="0200381099001028"   value="Inquiry"/> <!--Top Up Shopeepay-->
 
         <property name="0200501099010001"   value="Payment"/> <!--Halo Telkomsel-->
         <property name="0200501099010002"   value="Payment"/> <!--Prepaid Telkomsel-->
@@ -34,6 +36,8 @@
         <property name="0200501099014000"   value="Payment"/> <!--Prepaid Indosat-->
         <property name="0200501099001004"   value="Payment"/> <!--Top Up OVO-->
         <property name="0200501099001025"   value="Payment"/> <!--Top Up Gopay-->
+        <property name="0200501099001024"   value="Payment"/> <!--Top Up Dana-->
+        <property name="0200501099001028"   value="Payment"/> <!--Top Up Shopeepay-->
 
         <property name="0400501099010001"   value="Reversal"/> <!--Halo Telkomsel-->
         <property name="0400501099010002"   value="Reversal"/> <!--Prepaid Telkomsel-->
@@ -47,6 +51,8 @@
         <property name="0400501099014000"   value="Reversal"/> <!--Prepaid Indosat-->
         <property name="0400501099001004"   value="Reversal"/> <!--Top Up OVO-->
         <property name="0400501099001025"   value="Reversal"/> <!--Top Up Gopay-->
+        <property name="0400501099001024"   value="Reversal"/> <!--Top Up Dana-->
+        <property name="0400501099001028"   value="Reversal"/> <!--Top Up Shopeepay-->
 
         <property name="isorequest" value="REQUESTBILLER"/>
         <property name="isosource"  value="ISOBILLER"/>
